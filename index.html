@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <!-- VERCEL: Set GAS_URL here or via window.__GAS_URL__ / localStorage.__gas_url__ -->
-  <meta name="gas-url" content="__GAS_URL_PLACEHOLDER__">
+  <meta name="gas-url" content="https://script.google.com/macros/s/AKfycbwHNjzGCBgrM3umOSYJzY1WO079ucscGUUbVUWphai44wOnIhTbu1hgXrh_7ummaVyb/exec">
   <meta name="app-version" content="5.1.0">
   <meta name="app-env" content="vercel">
   <title>SIPADU CBT | Ujian Online</title>
@@ -6739,7 +6739,7 @@
 
 </style>
   <!-- VERCEL: GAS URL injected at build time -->
-  <div id="__GAS_CONFIG__" data-gas-url="__GAS_URL_PLACEHOLDER__" style="display:none"></div>
+  <div id="__GAS_CONFIG__" data-gas-url="https://script.google.com/macros/s/AKfycbwHNjzGCBgrM3umOSYJzY1WO079ucscGUUbVUWphai44wOnIhTbu1hgXrh_7ummaVyb/exec" style="display:none"></div>
   <!-- VERCEL: API client adapter — replaces google.script.run with fetch() -->
   <script src="/api-client.js"></script>
 </head>
@@ -41661,7 +41661,7 @@ function printStudentReport() {
   var fullHtml = '<!DOCTYPE html><html><head><meta charset="UTF-8">'
     + '<title>Laporan Siswa \u2014 '+_esc((res.student||{}).name||'')+'</title>'
     + '<style>'+_STUDENT_PRINT_CSS+'</style>'
-    + '<div id="__GAS_CONFIG__" data-gas-url="__GAS_URL_PLACEHOLDER__" style="display:none"></div>'
+    + '<div id="__GAS_CONFIG__" data-gas-url="https://script.google.com/macros/s/AKfycbwHNjzGCBgrM3umOSYJzY1WO079ucscGUUbVUWphai44wOnIhTbu1hgXrh_7ummaVyb/exec" style="display:none"></div>'
     + '<script src="/api-client.js"><\/script>'
     + '</head><body>'+body+'</body></html>';
   _openPrintBlobWindow(fullHtml, false);
@@ -41828,7 +41828,7 @@ function executeBulkPrint(responseIds) {
         + '<title>Laporan Siswa \u2014 '+_esc(examLabel)+'</title>'
         + '<style>'+_STUDENT_PRINT_CSS+'</style>'
         + '<!-- VERCEL: GAS URL injected at build time -->'
-        + '<div id="__GAS_CONFIG__" data-gas-url="__GAS_URL_PLACEHOLDER__" style="display:none"></div>'
+        + '<div id="__GAS_CONFIG__" data-gas-url="https://script.google.com/macros/s/AKfycbwHNjzGCBgrM3umOSYJzY1WO079ucscGUUbVUWphai44wOnIhTbu1hgXrh_7ummaVyb/exec" style="display:none"></div>'
         + '<!-- VERCEL: API client adapter \u2014 replaces google.script.run with fetch() -->'
         + '<script src="/api-client.js"><\/script>'
         + '</head><body>'+pages+'</body></html>';
@@ -42529,7 +42529,7 @@ function _openPrintBlobWindow(html, landscape) {
   try {
     var pageSize = landscape ? 'size:landscape;' : 'size:portrait;';
     var printCss = '<style>@media print{@page{' + pageSize + 'margin:10mm;}}</style>';
-    var gasBlock = '  <!-- VERCEL: GAS URL injected at build time -->\n  <div id="__GAS_CONFIG__" data-gas-url="__GAS_URL_PLACEHOLDER__" style="display:none"></div>\n  <!-- VERCEL: API client adapter \u2014 replaces google.script.run with fetch() -->\n  <script src="/api-client.js"><\/script>\n<\/head>';
+    var gasBlock = '  <!-- VERCEL: GAS URL injected at build time -->\n  <div id="__GAS_CONFIG__" data-gas-url="https://script.google.com/macros/s/AKfycbwHNjzGCBgrM3umOSYJzY1WO079ucscGUUbVUWphai44wOnIhTbu1hgXrh_7ummaVyb/exec" style="display:none"></div>\n  <!-- VERCEL: API client adapter \u2014 replaces google.script.run with fetch() -->\n  <script src="/api-client.js"><\/script>\n<\/head>';
     var fullHtml = html.replace(gasBlock, printCss + gasBlock);
 
     var iframeId = '__ia_print_frame__';
@@ -42579,7 +42579,7 @@ function _printAnalysisTable(opts) {
     + 'tr:nth-child(even){background:#f8fafc;}'
     + '</style>'
     + '<!-- VERCEL: GAS URL injected at build time -->'
-    + '<div id="__GAS_CONFIG__" data-gas-url="__GAS_URL_PLACEHOLDER__" style="display:none"></div>'
+    + '<div id="__GAS_CONFIG__" data-gas-url="https://script.google.com/macros/s/AKfycbwHNjzGCBgrM3umOSYJzY1WO079ucscGUUbVUWphai44wOnIhTbu1hgXrh_7ummaVyb/exec" style="display:none"></div>'
     + '<!-- VERCEL: API client adapter — replaces google.script.run with fetch() -->'
     + '<script src="/api-client.js"><\/script>'
     + '</head><body>'
@@ -43301,7 +43301,7 @@ function renderPGKAnalysisTable(res, container) {
       + '<title>Analisis Butir Soal — Benar/Salah</title>'
       + '<style>' + printCss + '</style>'
       + '<!-- VERCEL: GAS URL injected at build time -->'
-      + '<div id="__GAS_CONFIG__" data-gas-url="__GAS_URL_PLACEHOLDER__" style="display:none"></div>'
+      + '<div id="__GAS_CONFIG__" data-gas-url="https://script.google.com/macros/s/AKfycbwHNjzGCBgrM3umOSYJzY1WO079ucscGUUbVUWphai44wOnIhTbu1hgXrh_7ummaVyb/exec" style="display:none"></div>'
       + '<!-- VERCEL: API client adapter \u2014 replaces google.script.run with fetch() -->'
       + '<script src="/api-client.js"><\/script>'
       + '</head><body>'
@@ -44017,7 +44017,7 @@ function renderPGKAnalysisTable(res, container) {
       + '<title>Analisis Butir Soal — Menjodohkan</title>'
       + '<style>' + printCss + '</style>'
       + '<!-- VERCEL: GAS URL injected at build time -->'
-      + '<div id="__GAS_CONFIG__" data-gas-url="__GAS_URL_PLACEHOLDER__" style="display:none"></div>'
+      + '<div id="__GAS_CONFIG__" data-gas-url="https://script.google.com/macros/s/AKfycbwHNjzGCBgrM3umOSYJzY1WO079ucscGUUbVUWphai44wOnIhTbu1hgXrh_7ummaVyb/exec" style="display:none"></div>'
       + '<!-- VERCEL: API client adapter \u2014 replaces google.script.run with fetch() -->'
       + '<script src="/api-client.js"><\/script>'
       + '</head><body>'
