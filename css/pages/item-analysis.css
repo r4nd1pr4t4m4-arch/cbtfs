@@ -1,0 +1,280 @@
+﻿/* =============================================================
+   item-analysis.css — Analisis Butir Soal Page
+   Sumber: index.html L3703-3979
+   ============================================================= */
+  /* ═══════════════════════════════════════════════════
+     ITEM ANALYSIS PAGE — Upgraded UI + Mobile Fixes
+  ═══════════════════════════════════════════════════ */
+
+  /* Page wrapper */
+  .ia-page{ display:flex; flex-direction:column; gap:16px; }
+
+  /* ── Header banner ── */
+  .ia-header{
+    background:linear-gradient(135deg,#4c1d95 0%,#6d28d9 55%,#7c3aed 100%);
+    color:#fff; border-radius:16px; padding:20px 22px;
+    display:flex; flex-direction:column; gap:14px;
+    box-shadow:0 8px 24px rgba(109,40,217,.25);
+    position:relative; overflow:hidden;
+  }
+  .ia-header::before{
+    content:''; position:absolute; inset:0;
+    background:radial-gradient(circle at 80% 20%, rgba(255,255,255,.08) 0%, transparent 60%);
+    pointer-events:none;
+  }
+  @media(min-width:768px){
+    .ia-header{ flex-direction:row; align-items:center; justify-content:space-between; }
+  }
+  .ia-header h2{
+    font-size:17px; font-weight:900; line-height:1.25;
+    display:flex; align-items:center; gap:8px;
+  }
+  .ia-header h2 i{ opacity:.85; }
+  .ia-header p{ font-size:12px; color:rgba(255,255,255,.75); margin-top:3px; }
+
+  /* ── Legend ── */
+  .ia-legend{
+    background:linear-gradient(135deg,#faf5ff 0%,#f5f3ff 100%);
+    border:1px solid #e9d5ff; border-radius:12px;
+    padding:12px 16px;
+    display:grid; grid-template-columns:1fr; gap:10px;
+    font-size:11.5px; color:#475569;
+  }
+  @media(min-width:768px){ .ia-legend{ grid-template-columns:1fr 1fr; gap:14px; } }
+  .ia-legend-row{ line-height:1.7; }
+  .ia-legend-row b{ color:#1e293b; font-weight:800; display:block; margin-bottom:2px; }
+  .ia-legend-row span{ display:inline-block; margin:0 2px; }
+
+  /* ── Exam selector ── */
+  .ia-exam-row{
+    background:#fff; border:1.5px solid #e2e8f0; border-radius:14px;
+    padding:14px 16px;
+    display:flex; flex-direction:column; gap:10px;
+    box-shadow:0 1px 4px rgba(0,0,0,.04);
+    transition:border-color .15s, box-shadow .15s;
+  }
+  .ia-exam-row:focus-within{
+    border-color:#a78bfa;
+    box-shadow:0 0 0 3px rgba(167,139,250,.12), 0 1px 4px rgba(0,0,0,.04);
+  }
+  @media(min-width:640px){
+    .ia-exam-row{ flex-direction:row; align-items:flex-end; }
+  }
+  .ia-exam-row label{
+    font-size:10.5px; font-weight:800; color:#64748b;
+    text-transform:uppercase; letter-spacing:.05em;
+    margin-bottom:5px; display:block;
+  }
+  .ia-exam-row label i{ color:#7c3aed; margin-right:4px; }
+  .ia-exam-row select{
+    width:100%; padding:10px 14px;
+    border:1.5px solid #e2e8f0; border-radius:10px;
+    font-size:13px; font-weight:600; color:#1e293b;
+    background:#f8fafc; outline:none; cursor:pointer;
+    transition:all .15s; appearance:auto;
+  }
+  .ia-exam-row select:focus{
+    background:#fff; border-color:#7c3aed;
+    box-shadow:0 0 0 3px rgba(124,58,237,.15);
+  }
+  .ia-exam-row select:disabled{ opacity:.5; cursor:not-allowed; }
+
+  /* ── Main card ── */
+  .ia-card{
+    background:#fff; border:1.5px solid #e2e8f0; border-radius:16px;
+    overflow:hidden;
+    box-shadow:0 2px 8px rgba(0,0,0,.04);
+  }
+  /* Issue 15 fix: card-body has overflow-x:hidden so inner tables can't break the layout */
+  .ia-card-body{
+    padding:18px 16px;
+    overflow-x:hidden; /* prevent panel tables from breaking card width */
+  }
+  @media(min-width:640px){ .ia-card-body{ padding:18px 20px; } }
+
+  /* ── Sub-tabs (scrollable on mobile, nowrap always) ── */
+  .ia-tabs-wrap{
+    border-bottom:1.5px solid #e2e8f0;
+    overflow-x:auto; overflow-y:hidden;
+    /* Issue 17 fix: no shrink allowed — tabs keep min-width */
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:thin; scrollbar-color:#cbd5e1 transparent;
+  }
+  .ia-tabs-wrap::-webkit-scrollbar{ height:3px; }
+  .ia-tabs-wrap::-webkit-scrollbar-thumb{ background:#c4b5fd; border-radius:99px; }
+  .ia-tabs{
+    display:flex; /* not inline-flex — lets wrap:nowrap work with flex children */
+    flex-wrap:nowrap;
+    gap:0;
+    min-width:max-content; /* Issue 17 fix: never wraps below tab minimum */
+    padding:0 2px;
+  }
+  /* Issue 17 fix: white-space:nowrap on each tab button so text+icon never break */
+  .ia-sub-tab{
+    padding:11px 15px;
+    font-size:12px; font-weight:700;
+    color:#64748b; background:transparent;
+    border:none; border-bottom:2.5px solid transparent;
+    cursor:pointer; transition:all .15s;
+    display:inline-flex; align-items:center; gap:6px;
+    flex-shrink:0;
+    white-space:nowrap; /* Issue 17 fix */
+    position:relative;
+  }
+  .ia-sub-tab:hover{ color:#7c3aed; background:#faf5ff; }
+  .ia-sub-tab.active{
+    color:#7c3aed; border-color:#7c3aed;
+    background:linear-gradient(180deg,#faf5ff 0%,#f3e8ff 100%);
+    font-weight:800;
+  }
+  .ia-sub-tab:focus-visible{
+    outline:2px solid #a78bfa; outline-offset:-2px; border-radius:4px 4px 0 0;
+  }
+
+  /* ── Run analysis button ── */
+  .ia-run-btn{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:11px 22px; border-radius:12px;
+    font-size:13px; font-weight:800; color:#fff;
+    border:none; cursor:pointer; transition:all .18s;
+    box-shadow:0 4px 14px rgba(0,0,0,.12);
+    letter-spacing:.01em;
+    /* Mobile: full width on small screens */
+    max-width:100%;
+  }
+  @media(max-width:480px){
+    .ia-run-btn{ width:100%; justify-content:center; }
+  }
+  .ia-run-btn:hover{
+    transform:translateY(-2px);
+    box-shadow:0 8px 20px rgba(0,0,0,.18);
+    filter:brightness(1.06);
+  }
+  .ia-run-btn:active{ transform:translateY(0); box-shadow:0 2px 8px rgba(0,0,0,.1); }
+  .ia-run-btn:disabled{ opacity:.5; cursor:not-allowed; transform:none; filter:none; }
+  .ia-run-btn-pg    { background:linear-gradient(135deg,#6d28d9,#9333ea); }
+  .ia-run-btn-pgk   { background:linear-gradient(135deg,#3730a3,#6366f1); }
+  .ia-run-btn-bs    { background:linear-gradient(135deg,#0f766e,#14b8a6); }
+  .ia-run-btn-jodoh { background:linear-gradient(135deg,#3730a3,#6366f1); }
+  .ia-run-btn-esai  { background:linear-gradient(135deg,#be123c,#f43f5e); }
+  .ia-run-btn-rekap { background:linear-gradient(135deg,#0e7490,#06b6d4); }
+
+  /* ── Info note pill ── */
+  .ia-note{
+    background:#f0f9ff; border:1px solid #bae6fd;
+    border-radius:12px; padding:12px 16px;
+    font-size:11.5px; color:#0369a1;
+    display:flex; align-items:flex-start; gap:10px;
+    line-height:1.6;
+  }
+  .ia-note i{ flex-shrink:0; margin-top:1px; color:#0284c7; font-size:13px; }
+  .ia-note.indigo{ background:#eef2ff; border-color:#c7d2fe; color:#3730a3; }
+  .ia-note.indigo i{ color:#4f46e5; }
+  .ia-note.amber { background:#fffbeb; border-color:#fcd34d; color:#92400e; }
+  .ia-note.amber  i{ color:#d97706; }
+  .ia-note.success{ background:#f0fdf4; border-color:#a7f3d0; color:#065f46; }
+  .ia-note.success i{ color:#059669; }
+
+  /* ── Empty / loading state helper ── */
+  .ia-empty-state{
+    display:flex; flex-direction:column; align-items:center;
+    justify-content:center; gap:10px;
+    padding:48px 20px; text-align:center;
+    color:#94a3b8;
+  }
+  .ia-empty-state i{ font-size:2.5rem; opacity:.5; }
+  .ia-empty-state p{ font-size:13px; font-weight:600; margin:0; }
+  .ia-empty-state small{ font-size:11px; color:#cbd5e1; }
+
+  /* ── Loading spinner row ── */
+  .ia-loading{
+    display:flex; align-items:center; justify-content:center;
+    gap:12px; padding:48px 20px; color:#94a3b8;
+  }
+  .ia-loading span{ font-size:13px; font-weight:500; }
+
+  /* ── Responsive table wrapper (Issue 15 fix) ── */
+  /* All tables inside ia-card-body panels MUST be wrapped in this */
+  .ia-table-wrap{
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    border-radius:12px; border:1.5px solid #e2e8f0;
+    /* max-width keeps table from overflowing card */
+    max-width:100%;
+  }
+  .ia-table-wrap table{ min-width:540px; } /* prevent over-squish on mobile */
+
+  /* ── Stats grid (summary cards) ── */
+  .ia-stats-grid{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0,1fr));
+    gap:10px; margin-bottom:18px;
+  }
+  @media(min-width:640px){
+    .ia-stats-grid{ grid-template-columns:repeat(4, minmax(0,1fr)); }
+  }
+  .ia-stat-card{
+    border-radius:14px; padding:14px 12px; text-align:center;
+    border:1.5px solid transparent;
+    transition:transform .15s, box-shadow .15s;
+  }
+  .ia-stat-card:hover{ transform:translateY(-2px); box-shadow:0 6px 16px rgba(0,0,0,.08); }
+  .ia-stat-card .ia-stat-val{
+    font-size:1.75rem; font-weight:900; line-height:1.1;
+  }
+  .ia-stat-card .ia-stat-lbl{
+    font-size:10.5px; font-weight:700; margin-top:4px; opacity:.8;
+  }
+  .ia-stat-card .ia-stat-sub{
+    font-size:9.5px; margin-top:2px; opacity:.6;
+  }
+
+  /* ── Toolbar row (export/print buttons) ── */
+  .ia-toolbar{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:10px; flex-wrap:wrap; margin-bottom:14px;
+  }
+  .ia-toolbar-info{ font-size:11.5px; color:#64748b; display:flex; align-items:center; gap:5px; }
+  .ia-toolbar-info b{ color:#334155; }
+  .ia-toolbar-actions{ display:flex; gap:7px; flex-wrap:wrap; }
+
+  /* ── Accordion header quality indicator ── */
+  .ia-quality-badge{
+    display:inline-flex; align-items:center; gap:4px;
+    padding:2px 8px; border-radius:20px;
+    font-size:10px; font-weight:800; letter-spacing:.02em;
+  }
+
+  /* ── Mobile: confusion matrix overflow (Issue 16 fix) ── */
+  .ia-confusion-wrap{
+    overflow-x:auto; -webkit-overflow-scrolling:touch;
+    max-width:100%; border-radius:10px;
+    border:1.5px solid #c7d2fe;
+  }
+  /* min-column-width for matrix cells so they don't become invisible on mobile */
+  .ia-confusion-wrap table td,
+  .ia-confusion-wrap table th{ min-width:52px; }
+
+  /* ── Essay score input ── */
+  .essay-score-input{
+    width:80px; padding:7px 8px;
+    border:1.5px solid #cbd5e1; border-radius:10px;
+    text-align:center; font-weight:800; font-size:14px;
+    transition:border-color .15s, box-shadow .15s, background .15s;
+    outline:none;
+  }
+  .essay-score-input:focus{
+    border-color:#f43f5e;
+    box-shadow:0 0 0 3px rgba(244,63,94,.12);
+    background:#fff;
+  }
+  .essay-score-input.graded{
+    background:#f0fdf4; border-color:#6ee7b7;
+  }
+
+  /* ── Responsive student score-grid in print header ── */
+  @media(max-width:480px){
+    .ia-score-grid-2col{
+      grid-template-columns: repeat(2, minmax(0,1fr)) !important;
+    }
+  }

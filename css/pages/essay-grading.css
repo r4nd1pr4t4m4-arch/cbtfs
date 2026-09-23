@@ -1,0 +1,567 @@
+﻿/* =============================================================
+   essay-grading.css — Progres Koreksi Esai Page
+   Sumber: index.html L3139-3702
+   ============================================================= */
+  /* ═══════════════════════════════════════════════════
+     ESSAY GRADING PROGRESS PAGE  (.eg-*)
+     v2 — Bug fixes + UI/UX upgrade
+  ═══════════════════════════════════════════════════ */
+
+  /* FIX #5: padding-bottom agar konten tidak terpotong navbar mobile */
+  .eg-page { display:flex; flex-direction:column; gap:16px; padding-bottom: 24px; }
+
+  /* ── Skeleton shimmer ── */
+  @keyframes eg-shimmer {
+    0%   { background-position: -400px 0; }
+    100% { background-position:  400px 0; }
+  }
+  .eg-skel {
+    background: linear-gradient(90deg, #f1f5f9 25%, #e8edf4 50%, #f1f5f9 75%);
+    background-size: 800px 100%;
+    animation: eg-shimmer 1.4s ease-in-out infinite;
+    border-radius: 6px;
+    flex-shrink: 0;
+  }
+
+  /* ── Skeleton stat card — dimensi identik dengan card nyata ── */
+  .eg-stat-card-skel {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 13px 14px;
+    display: flex; flex-direction: column; gap: 4px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    /* height sama dengan card asli: icon(30)+gap(5)+value(22)+gap(4)+label(13)+padding(26) ≈ 100px */
+    min-height: 100px;
+  }
+
+  /* ── Skeleton exam card — tinggi mendekati card nyata ── */
+  .eg-exam-card-skel {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-left: 4px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    display: flex; flex-direction: column; gap: 12px;
+    /* reserved height mendekati eg-exam-card asli dengan semua elemen */
+    min-height: 152px;
+  }
+  .eg-exam-card-skel .skel-row {
+    display: flex; gap: 10px; align-items: center;
+  }
+  .eg-exam-card-skel .skel-stats {
+    display: flex; gap: 6px; flex-wrap: wrap;
+    border-top: 1px solid #f1f5f9; padding-top: 10px;
+  }
+
+  /* ── Skeleton modal body ── */
+  .eg-modal-body-skel {
+    display: flex; flex-direction: column; gap: 20px;
+    padding: 16px 20px;
+  }
+  /* Setiap section skeleton dipadding sama dengan section nyata */
+  .eg-modal-body-skel .skel-section {
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .eg-modal-body-skel .skel-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 8px;
+  }
+  .eg-modal-body-skel .skel-grid-item {
+    border: 1px solid #e2e8f0; border-radius: 10px;
+    padding: 10px 12px; display: flex; flex-direction: column; gap: 6px;
+    min-height: 56px;
+  }
+  .eg-modal-body-skel .skel-table-row {
+    display: flex; gap: 8px; align-items: center;
+    padding: 8px 0; border-bottom: 1px solid #f1f5f9;
+  }
+
+  /* ── Reserved space untuk #eg-list saat loading ──
+     min-height = tinggi 4 skeleton card + gap antar card.
+     Ini mencegah halaman berubah tinggi saat data masuk. */
+  #eg-list.eg-list-loading {
+    min-height: calc(4 * 152px + 3 * 10px);
+  }
+
+  /* ── Cegah fade-in exam card dari menyebabkan layout shift ──
+     translateY(0) saja, tanpa mendorong elemen lain */
+  .eg-exam-card.fade-in {
+    animation: eg-card-fadein .25s ease forwards;
+  }
+  @keyframes eg-card-fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  /* ── Header banner ── */
+  .eg-header {
+    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 45%, #4338ca 100%);
+    border-radius: 14px;
+    padding: 20px 22px;
+    color: #fff;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    position: relative;
+    overflow: hidden;
+  }
+  /* Decorative orb */
+  .eg-header::before {
+    content: '';
+    position: absolute; top: -40px; right: -30px;
+    width: 140px; height: 140px;
+    background: rgba(255,255,255,.06);
+    border-radius: 50%; pointer-events: none;
+  }
+  .eg-header-left { min-width: 0; flex: 1; }
+  .eg-header-left h2 {
+    font-size: 17px; font-weight: 700; margin: 0 0 4px;
+    display: flex; align-items: center; gap: 8px;
+    line-height: 1.3;
+  }
+  .eg-header-left p { font-size: 12px; color: rgba(255,255,255,0.65); margin: 0; }
+
+  /* Header quick-stats strip */
+  .eg-header-stats {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    margin-top: 12px;
+  }
+  .eg-header-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 20px; padding: 4px 10px;
+    font-size: 11px; font-weight: 600; color: #fff;
+    white-space: nowrap;
+  }
+  .eg-header-pill i { font-size: 10px; opacity: .8; }
+
+  /* FIX #3: icon animasi dikendalikan class di button, bukan nested CSS */
+  .eg-refresh-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(255,255,255,0.13); color: #fff;
+    border: 1px solid rgba(255,255,255,0.22);
+    border-radius: 8px; padding: 7px 14px;
+    font-size: 12px; font-weight: 600; cursor: pointer;
+    transition: background .15s, opacity .15s;
+    white-space: nowrap; flex-shrink: 0;
+    align-self: flex-start;
+  }
+  .eg-refresh-btn:hover:not(:disabled) { background: rgba(255,255,255,0.24); }
+  .eg-refresh-btn:disabled { opacity: .55; cursor: not-allowed; }
+  /* FIX #3: animasi spin pada icon refresh diterapkan via class di <i> langsung */
+  @keyframes eg-spin { to { transform: rotate(360deg); } }
+  .eg-spin { animation: eg-spin .7s linear infinite; }
+
+  /* ── Summary cards grid ── */
+  .eg-summary-grid {
+    display: grid;
+    /* FIX #5 mobile: minmax lebih kecil agar tidak overflow pada 360px */
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 10px;
+  }
+  .eg-stat-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 13px 14px;
+    display: flex; flex-direction: column; gap: 4px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    transition: box-shadow .15s, transform .15s;
+  }
+  .eg-stat-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.08); transform: translateY(-1px); }
+  .eg-stat-icon {
+    width: 30px; height: 30px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; margin-bottom: 5px; flex-shrink: 0;
+  }
+  .eg-stat-value { font-size: 22px; font-weight: 800; color: #1e293b; line-height: 1; }
+  .eg-stat-label { font-size: 10px; font-weight: 600; color: #64748b; line-height: 1.3; }
+
+  /* ── Filter / toolbar bar ── */
+  .eg-toolbar {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .eg-search-wrap {
+    position: relative;
+    /* FIX #5: flex basis agar search tidak terlalu sempit di mobile */
+    flex: 1 1 160px;
+    min-width: 0;
+  }
+  .eg-search-wrap i {
+    position: absolute; left: 10px; top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8; font-size: 12px; pointer-events: none;
+  }
+  .eg-search-input {
+    width: 100%; padding: 7px 10px 7px 30px;
+    border: 1px solid #e2e8f0; border-radius: 8px;
+    font-size: 12px; color: #334155; outline: none;
+    transition: border-color .15s, box-shadow .15s;
+    box-sizing: border-box; background: #f8fafc;
+  }
+  .eg-search-input:focus {
+    border-color: #a5b4fc;
+    box-shadow: 0 0 0 3px rgba(165,180,252,.18);
+    background: #fff;
+  }
+  /* FIX #5: select tidak punya min-width agar bisa shrink di mobile, cukup flex-shrink */
+  .eg-filter-select {
+    padding: 6px 8px; border: 1px solid #e2e8f0;
+    border-radius: 8px; font-size: 11px; color: #475569;
+    background: #f8fafc; cursor: pointer; outline: none;
+    /* FIX #5: hapus min-width fixed, gunakan flex-shrink dan max-width saja */
+    flex: 0 1 auto; max-width: 160px; min-width: 0;
+    transition: border-color .15s;
+  }
+  .eg-filter-select:focus {
+    border-color: #a5b4fc;
+    box-shadow: 0 0 0 3px rgba(165,180,252,.18);
+    background: #fff;
+  }
+  /* Sort button */
+  .eg-sort-btn {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 6px 10px; border: 1px solid #e2e8f0;
+    border-radius: 8px; font-size: 11px; font-weight: 600;
+    color: #475569; background: #f8fafc; cursor: pointer;
+    transition: all .12s; white-space: nowrap; flex-shrink: 0;
+  }
+  .eg-sort-btn:hover { background: #eef2ff; border-color: #c7d2fe; color: #4338ca; }
+  .eg-sort-btn.active { background: #eef2ff; border-color: #a5b4fc; color: #4338ca; }
+
+  /* Results count label */
+  .eg-results-count {
+    font-size: 11px; color: #94a3b8; font-weight: 600;
+    white-space: nowrap; margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  /* ── Exam list ── */
+  .eg-exam-list { display: flex; flex-direction: column; gap: 10px; }
+
+  .eg-exam-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    transition: box-shadow .15s, border-color .15s, transform .15s;
+    cursor: pointer;
+    /* FIX #5: cegah konten meluber keluar card */
+    overflow: hidden;
+  }
+  .eg-exam-card:hover {
+    box-shadow: 0 4px 18px rgba(0,0,0,0.1);
+    border-color: #c7d2fe;
+    transform: translateY(-1px);
+  }
+  .eg-exam-card:focus-visible {
+    outline: 2px solid #6366f1; outline-offset: 2px;
+  }
+  /* Status border-left + subtle tint */
+  .eg-exam-card.status-done    { border-left: 4px solid #10b981; background: #fafffe; }
+  .eg-exam-card.status-partial { border-left: 4px solid #f59e0b; background: #fffdf5; }
+  .eg-exam-card.status-none    { border-left: 4px solid #cbd5e1; }
+
+  .eg-card-top {
+    display: flex; align-items: flex-start;
+    justify-content: space-between; gap: 10px;
+    flex-wrap: wrap; margin-bottom: 10px;
+  }
+  .eg-card-title {
+    font-size: 14px; font-weight: 700; color: #1e293b;
+    margin: 0 0 4px; line-height: 1.35;
+    word-break: break-word;
+  }
+  .eg-card-meta {
+    font-size: 11px; color: #64748b; display: flex;
+    flex-wrap: wrap; gap: 6px; margin: 0;
+    align-items: center;
+  }
+  .eg-card-meta span { display: inline-flex; align-items: center; gap: 3px; }
+
+  /* Status badge */
+  .eg-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    border-radius: 20px; padding: 4px 10px;
+    font-size: 10px; font-weight: 700;
+    white-space: nowrap; flex-shrink: 0;
+    letter-spacing: .02em;
+  }
+  .eg-badge-done    { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+  .eg-badge-partial { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+  .eg-badge-none    { background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; }
+
+  /* Progress bar */
+  .eg-progress-wrap { margin-bottom: 10px; }
+  .eg-progress-label {
+    display: flex; justify-content: space-between;
+    font-size: 11px; font-weight: 600;
+    color: #94a3b8; margin-bottom: 5px;
+    align-items: baseline;
+  }
+  .eg-progress-track {
+    width: 100%; height: 7px; background: #f1f5f9;
+    border-radius: 20px; overflow: hidden;
+  }
+  .eg-progress-bar {
+    height: 100%; border-radius: 20px;
+    transition: width .55s cubic-bezier(.4,0,.2,1);
+  }
+  .eg-progress-bar.done    { background: linear-gradient(90deg, #10b981, #34d399); }
+  .eg-progress-bar.partial { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+  .eg-progress-bar.none    { background: #e2e8f0; width: 0 !important; }
+
+  /* Stats row */
+  .eg-card-stats {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    font-size: 11px; color: #64748b;
+    border-top: 1px solid #f1f5f9;
+    padding-top: 10px;
+  }
+  .eg-card-stat {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: #f8fafc; border: 1px solid #e2e8f0;
+    border-radius: 6px; padding: 3px 8px;
+    font-weight: 600; white-space: nowrap;
+  }
+  .eg-card-stat i { color: #94a3b8; font-size: 10px; }
+
+  /* ── Empty / Error / Loading states ── */
+  .eg-empty {
+    background: #fff; border: 1px dashed #e2e8f0;
+    border-radius: 12px; padding: 48px 24px;
+    text-align: center; color: #94a3b8;
+  }
+  .eg-empty i { font-size: 34px; margin-bottom: 10px; display: block; }
+  .eg-empty p  { font-size: 13px; margin: 0; line-height: 1.6; }
+  .eg-empty p strong { color: #475569; display: block; margin-bottom: 4px; font-size: 14px; }
+
+  /* ── Detail Modal ── */
+  .eg-modal-overlay {
+    position: fixed; inset: 0; z-index: 9800;
+    background: rgba(15,23,42,0.55);
+    display: flex; align-items: flex-end; justify-content: center;
+    padding: 0;
+    opacity: 0; pointer-events: none;
+    transition: opacity .2s;
+  }
+  .eg-modal-overlay.open { opacity: 1; pointer-events: auto; }
+  @media (min-width: 640px) {
+    .eg-modal-overlay { align-items: center; padding: 16px; }
+  }
+  .eg-modal {
+    background: #fff;
+    border-radius: 20px 20px 0 0;
+    width: 100%; max-width: 780px;
+    /* FIX: gunakan dvh dengan fallback vh; 92 untuk mobile, 88 untuk desktop */
+    max-height: 92dvh; max-height: 92vh;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    transform: translateY(44px);
+    transition: transform .28s cubic-bezier(.4,0,.2,1);
+    box-shadow: 0 -6px 40px rgba(0,0,0,0.18);
+  }
+  .eg-modal-overlay.open .eg-modal { transform: translateY(0); }
+  @media (min-width: 640px) {
+    .eg-modal {
+      border-radius: 16px;
+      max-height: 88dvh; max-height: 88vh;
+      transform: scale(.96) translateY(10px);
+      box-shadow: 0 24px 64px rgba(0,0,0,0.22);
+    }
+    .eg-modal-overlay.open .eg-modal { transform: scale(1) translateY(0); }
+  }
+
+  /* Drag handle untuk mobile sheet */
+  .eg-modal-handle {
+    width: 40px; height: 4px; border-radius: 4px;
+    background: #e2e8f0; margin: 10px auto 0;
+    flex-shrink: 0;
+  }
+  @media (min-width: 640px) { .eg-modal-handle { display: none; } }
+
+  .eg-modal-header {
+    padding: 12px 20px 14px;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex; align-items: flex-start;
+    justify-content: space-between; gap: 12px;
+    flex-shrink: 0;
+  }
+  .eg-modal-title { font-size: 15px; font-weight: 700; color: #1e293b; margin: 0 0 2px; word-break: break-word; }
+  .eg-modal-sub   { font-size: 11px; color: #94a3b8; margin: 0; }
+  .eg-modal-close {
+    width: 30px; height: 30px; border-radius: 8px;
+    border: 1px solid #e2e8f0; background: #f8fafc;
+    color: #64748b; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; flex-shrink: 0;
+    transition: background .12s, color .12s;
+  }
+  .eg-modal-close:hover { background: #fee2e2; color: #dc2626; border-color: #fca5a5; }
+
+  /* FIX #1 KRITIS: .eg-modal-body sebelumnya tidak punya closing brace */
+  .eg-modal-body {
+    flex: 1; overflow-y: auto; overflow-x: hidden;
+    padding: 16px 20px;
+    display: flex; flex-direction: column; gap: 16px;
+  }
+
+  /* Modal footer — sticky action bar */
+  .eg-modal-footer {
+    padding: 12px 20px;
+    border-top: 1px solid #f1f5f9;
+    display: flex; align-items: center; gap: 8px;
+    flex-shrink: 0; flex-wrap: wrap;
+    background: #fafafa;
+  }
+  .eg-modal-action-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 16px; border-radius: 8px; border: none;
+    font-size: 12px; font-weight: 700; cursor: pointer;
+    transition: background .15s, transform .12s;
+    white-space: nowrap;
+  }
+  .eg-modal-action-btn:hover { transform: translateY(-1px); }
+  .eg-modal-action-btn.primary {
+    background: linear-gradient(135deg, #4f46e5, #6366f1);
+    color: #fff; box-shadow: 0 2px 8px rgba(99,102,241,.3);
+  }
+  .eg-modal-action-btn.primary:hover { background: linear-gradient(135deg, #4338ca, #4f46e5); }
+  .eg-modal-action-btn.secondary {
+    background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0;
+  }
+  .eg-modal-action-btn.secondary:hover { background: #e2e8f0; }
+
+  /* Modal summary strip */
+  .eg-modal-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 8px;
+  }
+  .eg-modal-stat {
+    background: #f8fafc; border: 1px solid #e2e8f0;
+    border-radius: 10px; padding: 10px 12px;
+    text-align: center;
+  }
+  .eg-modal-stat-val  { font-size: 19px; font-weight: 800; color: #1e293b; line-height: 1; }
+  .eg-modal-stat-lbl  { font-size: 10px; font-weight: 600; color: #94a3b8; margin-top: 3px; line-height: 1.3; }
+
+  /* Overall progress inside modal */
+  .eg-modal-progress-wrap { margin-top: 12px; }
+  .eg-modal-progress-label {
+    display: flex; justify-content: space-between;
+    align-items: baseline; margin-bottom: 5px;
+  }
+  .eg-modal-progress-label span:first-child { font-size: 11px; font-weight: 600; color: #64748b; }
+  .eg-modal-progress-label span:last-child  { font-size: 13px; font-weight: 800; }
+
+  /* Graders list */
+  .eg-grader-list { display: flex; flex-direction: column; gap: 6px; }
+  .eg-grader-item {
+    display: flex; align-items: center; gap: 10px;
+    background: #f8fafc; border: 1px solid #e2e8f0;
+    border-radius: 8px; padding: 8px 12px;
+    font-size: 12px;
+  }
+  .eg-grader-avatar {
+    width: 28px; height: 28px; border-radius: 7px;
+    background: linear-gradient(135deg, #818cf8, #4f46e5);
+    color: #fff; font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .eg-grader-name  { font-weight: 600; color: #334155; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .eg-grader-time  { font-size: 10px; color: #94a3b8; white-space: nowrap; flex-shrink: 0; }
+
+  /* Participant table */
+  .eg-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+  }
+  .eg-table {
+    width: 100%; border-collapse: collapse;
+    font-size: 12px; min-width: 460px;
+  }
+  .eg-table th {
+    background: #f8fafc; color: #64748b;
+    font-weight: 700; font-size: 10px;
+    text-transform: uppercase; letter-spacing: .05em;
+    padding: 9px 12px; text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+    white-space: nowrap;
+  }
+  .eg-table td {
+    padding: 8px 12px; color: #334155;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+  }
+  .eg-table tr:last-child td { border-bottom: none; }
+  .eg-table tr:hover td { background: #fafbff; }
+  .eg-table .mini-bar-wrap { display: flex; align-items: center; gap: 6px; }
+  .eg-table .mini-bar-track {
+    flex: 1; height: 6px; background: #f1f5f9;
+    border-radius: 20px; overflow: hidden; min-width: 40px;
+  }
+  .eg-table .mini-bar-fill {
+    height: 100%; border-radius: 20px; transition: width .4s;
+  }
+  .eg-table .mini-bar-fill.done    { background: linear-gradient(90deg,#10b981,#34d399); }
+  .eg-table .mini-bar-fill.partial { background: linear-gradient(90deg,#f59e0b,#fbbf24); }
+  .eg-table .mini-bar-fill.none    { background: #e2e8f0; width: 0 !important; }
+  .eg-table .mini-bar-pct { font-weight: 700; color: #475569; font-size: 10px; white-space: nowrap; }
+
+  /* Section heading inside modal */
+  .eg-section-title {
+    font-size: 11px; font-weight: 700; color: #475569;
+    text-transform: uppercase; letter-spacing: .07em;
+    display: flex; align-items: center; gap: 6px;
+    margin: 0 0 8px;
+  }
+  .eg-section-title i { color: #94a3b8; font-size: 11px; }
+  .eg-section-title::after {
+    content: ''; flex: 1; height: 1px; background: #e2e8f0;
+  }
+
+  /* ── Responsive tweaks ── */
+  @media (max-width: 540px) {
+    /* FIX #5: filter bar wrap dengan baik di layar kecil */
+    .eg-toolbar { padding: 10px 12px; gap: 6px; }
+    .eg-search-wrap { flex-basis: 100%; }
+    .eg-filter-select { flex: 1 1 calc(50% - 3px); max-width: none; font-size: 11px; }
+    .eg-sort-btn { flex: 1 1 auto; justify-content: center; }
+    .eg-results-count { order: -1; width: 100%; }
+
+    .eg-card-top { flex-direction: column; gap: 8px; }
+    .eg-badge { align-self: flex-start; }
+    .eg-card-stats { gap: 5px; }
+    .eg-card-stat { font-size: 10px; }
+
+    .eg-modal-header { padding: 12px 14px; }
+    .eg-modal-body   { padding: 12px 14px; gap: 12px; }
+    .eg-modal-footer { padding: 10px 14px; }
+    .eg-modal-summary { grid-template-columns: repeat(2, 1fr); }
+    .eg-modal-action-btn { flex: 1; justify-content: center; }
+  }
+  @media (max-width: 360px) {
+    .eg-summary-grid { grid-template-columns: 1fr 1fr; }
+    .eg-stat-value { font-size: 18px; }
+    .eg-header { padding: 16px 14px; }
+    .eg-header-left h2 { font-size: 15px; }
+    .eg-filter-select { font-size: 10px; }
+  }

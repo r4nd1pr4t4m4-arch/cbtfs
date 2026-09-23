@@ -1,0 +1,34 @@
+/* =============================================================
+   main.css — CSS Entry Point
+   SIPADU CBT v5.1.0
+
+   Urutan import penting untuk cascade yang benar:
+   1. Global base (reset, typography, utilities)
+   2. Components (sidebar, navbar, bell, dll)
+   3. Pages (styling per halaman)
+   ============================================================= */
+
+/* ── 1. Global Base ── */
+@import url('./global.css');
+
+/* ── 2. Components ── */
+@import url('./components/sidebar.css');
+@import url('./components/navbar.css');
+@import url('./components/modal-notif.css');
+@import url('./components/batch-soal-ui.css');
+@import url('./components/custom-keyboard.css');
+
+/* ── 3. Pages ── */
+@import url('./pages/login.css');
+@import url('./pages/exam-schedule.css');
+@import url('./pages/bank-soal.css');
+@import url('./pages/question-bank.css');
+@import url('./pages/progress-soal.css');
+@import url('./pages/results.css');
+@import url('./pages/users.css');
+@import url('./pages/images.css');
+@import url('./pages/config.css');
+@import url('./pages/master-data.css');
+@import url('./pages/admin-logs.css');
+@import url('./pages/essay-grading.css');
+@import url('./pages/item-analysis.css');

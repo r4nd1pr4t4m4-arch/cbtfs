@@ -1,0 +1,100 @@
+﻿/* =============================================================
+   config.css — Konfigurasi Sistem Page
+   Sumber: index.html L2670-2766
+   ============================================================= */
+  /* ───── Config Page Responsive Overrides ───── */
+  /* Make the 5-column summary card grid actually responsive */
+  .cfgv2 > .grid3[style*="repeat(5"]{
+    grid-template-columns:repeat(2, minmax(0, 1fr)) !important;
+  }
+  @media(min-width:640px){
+    .cfgv2 > .grid3[style*="repeat(5"]{
+      grid-template-columns:repeat(3, minmax(0, 1fr)) !important;
+    }
+  }
+  @media(min-width:1024px){
+    .cfgv2 > .grid3[style*="repeat(5"]{
+      grid-template-columns:repeat(5, minmax(0, 1fr)) !important;
+    }
+  }
+  /* KOP format rows: stack input + format on small screens */
+  @media(max-width:640px){
+    .cfgv2 div[style*="grid-template-columns:1fr auto"]{
+      grid-template-columns:1fr !important;
+    }
+    .cfgv2 .kop-fmt-row{ justify-content:flex-start; }
+    /* Format toolbar: beri jarak atas saat stacked */
+    .cfgv2 div[style*="grid-template-columns:1fr auto"] > div[style*="padding-bottom:1px"] {
+      padding-top: 4px;
+      border-top: 1px solid #f1f5f9;
+      margin-top: 2px;
+    }
+  }
+  /* Backup section grid → 1col mobile */
+  @media(max-width:640px){
+    .cfgv2 #sec-backup .card-body div[style*="grid-template-columns:1fr 1fr"]{
+      grid-template-columns:1fr !important;
+    }
+  }
+  /* Progress card header: stack on mobile */
+  @media(max-width:640px){
+    .cfgv2 .progress-card > div:first-child{
+      flex-direction:column !important;
+      align-items:stretch !important;
+    }
+    .cfgv2 .progress-card > div:first-child button[type="submit"]{
+      width:100%; justify-content:center;
+    }
+  }
+  /* Section card-head: avoid header overlap on small screens */
+  .cfgv2 .card-head{ flex-wrap:wrap; gap:8px; }
+
+  /* ── UI/UX upgrades ── */
+  /* Progress bar: transition animasi sudah di .prog-fill, pastikan warna awal netral */
+  .cfgv2 #cfg-progress-fill { transition: width 0.65s cubic-bezier(0.4,0,0.2,1), background 0.4s ease; }
+  /* Summary cards: cursor + active state lebih jelas */
+  .cfgv2 .summ-card { cursor:pointer; transition: border-color 0.18s, box-shadow 0.18s, transform 0.15s; }
+  .cfgv2 .summ-card:active { transform: scale(0.97); }
+  /* card-head tombol Reset: lebih terlihat di semua ukuran */
+  .cfgv2 .btn-ghost { white-space:nowrap; }
+  /* field-inp: focus ring lebih konsisten lintas browser */
+  .cfgv2 .field-inp:focus { outline:none; }
+  /* Section number badge: sedikit lebih besar agar terbaca */
+  .cfgv2 .sect-num { font-size:11px; width:22px; height:22px; }
+  /* hint-row: smooth show/hide */
+  .cfgv2 .hint-row { transition: opacity 0.2s; }
+  /* card hover subtle lift */
+  .cfgv2 .card { transition: box-shadow 0.2s; }
+  .cfgv2 .card:focus-within { box-shadow: 0 2px 12px rgba(37,99,235,0.08); }
+  /* AI key input: prevent toggle button overflow on small */
+  .cfgv2 #cfg-anthropic-key + button span{ display:none; }
+  @media(min-width:480px){ .cfgv2 #cfg-anthropic-key + button span{ display:inline; } }
+  /* AI test button stack on mobile */
+  @media(max-width:480px){
+    .cfgv2 .card-body > div > div[style*="display:flex;gap:8px"]{
+      flex-direction:column !important;
+    }
+    .cfgv2 .card-body > div > div[style*="display:flex;gap:8px"] button{
+      width:100%; justify-content:center;
+    }
+  }
+  /* Sticky save FAB on mobile */
+  @media(max-width:768px){
+    .cfgv2{ padding-bottom:80px; }
+  }
+  #cfg-fab-save{
+    position:fixed; bottom:18px; left:50%; transform:translateX(-50%);
+    z-index:60; padding:12px 20px;
+    background:#2563eb; color:#fff; border:none; border-radius:99px;
+    font-size:13px; font-weight:800; cursor:pointer;
+    box-shadow:0 8px 24px rgba(37,99,235,.45);
+    display:none; align-items:center; gap:8px;
+    transition:transform .12s, box-shadow .15s;
+  }
+  #cfg-fab-save:hover{ background:#1d4ed8; }
+  #cfg-fab-save:active{ transform:translateX(-50%) scale(.96); }
+  @media(max-width:768px){
+    #cfg-fab-save.show{ display:inline-flex; }
+  }
+  /* Section anchor highlight smoother */
+  .cfgv2 .card{ scroll-margin-top:80px; }

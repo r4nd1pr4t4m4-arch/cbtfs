@@ -1,0 +1,365 @@
+﻿/* =============================================================
+   sidebar.css — Sidebar Navigation Styles
+   SIPADU CBT v5.1.0
+   Sumber: index.html L72-431
+   ============================================================= */
+  /* ═══════════════════════════════════════════════════
+     SIDEBAR — Modern Pro Redesign
+  ═══════════════════════════════════════════════════ */
+  .sidebar-bg {
+    background: linear-gradient(180deg, #0d1424 0%, #0f172a 60%, #0c1220 100%);
+    border-right: 1px solid rgba(255,255,255,0.05);
+    color: #cbd5e1;
+    position: relative;
+  }
+  /* Subtle left accent glow */
+  .sidebar-bg::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 1px; height: 100%;
+    background: linear-gradient(180deg, transparent 0%, rgba(99,102,241,0.5) 40%, rgba(59,130,246,0.4) 70%, transparent 100%);
+    pointer-events: none;
+  }
+
+  /* ── Sidebar Item ── */
+  .sidebar-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 9px 12px;
+    margin-bottom: 1px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.18s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s ease;
+    overflow: hidden;
+    white-space: nowrap;
+    font-weight: 500;
+    font-size: 0.8rem;
+    color: #64748b;
+    border: 1px solid transparent;
+    letter-spacing: 0.01em;
+  }
+  /* Active glow bar */
+  .sidebar-item::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 50%;
+    transform: translateY(-50%) scaleY(0);
+    width: 3px;
+    height: 65%;
+    background: linear-gradient(180deg, #818cf8, #3b82f6);
+    border-radius: 0 4px 4px 0;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 2px 0 10px rgba(99,102,241,0.5);
+  }
+  /* Ripple shimmer on hover */
+  .sidebar-item::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 10px;
+    background: radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(148,163,184,0.08) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+  .sidebar-item:hover::after { opacity: 1; }
+  .sidebar-item:hover {
+    background: rgba(148, 163, 184, 0.065);
+    color: #cbd5e1;
+    transform: translateX(3px);
+  }
+  .sidebar-item.active {
+    background: linear-gradient(135deg, rgba(99,102,241,0.18) 0%, rgba(59,130,246,0.12) 100%);
+    color: #a5b4fc;
+    border-color: rgba(99,102,241,0.22);
+    font-weight: 600;
+    box-shadow: 0 2px 12px rgba(99,102,241,0.12), inset 0 1px 0 rgba(255,255,255,0.04);
+    transform: translateX(2px);
+  }
+  .sidebar-item.active::before {
+    transform: translateY(-50%) scaleY(1);
+  }
+  /* Icon wrapper circle for active */
+  .sidebar-item.active .sidebar-icon-wrap {
+    background: rgba(99,102,241,0.2);
+    color: #818cf8;
+  }
+  .sidebar-item i {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    margin-right: 10px;
+    font-size: 0.82rem;
+    flex-shrink: 0;
+    transition: color 0.2s, background 0.2s, transform 0.2s;
+    color: #475569;
+    background: rgba(255,255,255,0.03);
+  }
+  .sidebar-item:hover i {
+    color: #94a3b8;
+    background: rgba(255,255,255,0.06);
+    transform: scale(1.1);
+  }
+  .sidebar-item.active i {
+    color: #818cf8;
+    background: rgba(99,102,241,0.18);
+  }
+  .sidebar-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06) 30%, rgba(255,255,255,0.06) 70%, transparent);
+    margin: 10px 14px;
+  }
+  .sidebar-section-label {
+    padding: 10px 14px 3px;
+    font-size: 9.5px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .sidebar-section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 1px;
+  }
+
+  /* ── Collapsed Sidebar ── */
+  #admin-sidebar.collapsed {
+    width: 70px;
+  }
+  #admin-sidebar.collapsed .sidebar-text,
+  #admin-sidebar.collapsed .user-info-text,
+  #admin-sidebar.collapsed .sidebar-header-text,
+  #admin-sidebar.collapsed .sidebar-section-label,
+  #admin-sidebar.collapsed .section-label,
+  #admin-sidebar.collapsed .sidebar-version-tag {
+    display: none;
+  }
+  #admin-sidebar.collapsed .sidebar-item {
+    justify-content: center;
+    padding: 10px 0;
+    transform: none !important;
+    margin-left: 3px;
+    margin-right: 3px;
+  }
+  #admin-sidebar.collapsed .sidebar-item i {
+    margin-right: 0;
+    width: 34px;
+    height: 34px;
+  }
+  #admin-sidebar.collapsed .sidebar-item::before { display: none; }
+  #admin-sidebar.collapsed .user-info-avatar { margin: 0 auto; flex-shrink: 0; }
+  #admin-sidebar.collapsed .sidebar-user-card {
+    justify-content: center;
+    padding-left: 4px;
+    padding-right: 4px;
+    gap: 0;
+    overflow: hidden;
+  }
+  #admin-sidebar.collapsed .sidebar-divider { margin: 6px 8px; }
+  #admin-sidebar.collapsed .sidebar-logo-text { display: none; }
+
+  /* Tooltip for collapsed */
+  #admin-sidebar.collapsed .sidebar-item[data-tooltip] {
+    position: relative;
+  }
+  #admin-sidebar.collapsed .sidebar-item[data-tooltip]::before {
+    display: none;
+  }
+  #admin-sidebar.collapsed .sidebar-item[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: calc(100% + 12px);
+    top: 50%;
+    transform: translateY(-50%) scale(0.9);
+    background: #1e293b;
+    color: #e2e8f0;
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 8px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    border: 1px solid rgba(255,255,255,0.09);
+    transition: opacity 0.15s, transform 0.15s;
+    z-index: 9999;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    background: radial-gradient(ellipse at top left, #1e2d45, #0f172a);
+  }
+  #admin-sidebar.collapsed .sidebar-item:hover[data-tooltip]::after {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+  }
+
+  /* ── Sidebar Header Logo pulse ring ── */
+  @keyframes sb-logo-pulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(99,102,241,0.4), 0 4px 20px rgba(99,102,241,0.25); }
+    50%      { box-shadow: 0 0 0 6px rgba(99,102,241,0), 0 4px 20px rgba(99,102,241,0.1); }
+  }
+  .sidebar-logo-icon {
+    animation: sb-logo-pulse 3s ease-in-out infinite;
+  }
+
+  /* ── User card in sidebar ── */
+  .sidebar-user-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .sidebar-user-card:hover {
+    background: rgba(255,255,255,0.055);
+    border-color: rgba(255,255,255,0.1);
+  }
+
+  /* ── Sidebar version tag ── */
+  .sidebar-version-tag {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    background: rgba(99,102,241,0.12);
+    color: #818cf8;
+    border: 1px solid rgba(99,102,241,0.2);
+    border-radius: 99px;
+    padding: 1.5px 6px;
+  }
+
+  /* ── Logout button ── */
+  .sidebar-logout-btn {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 9px 12px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.18s;
+    color: #64748b;
+    font-size: 0.8rem;
+    font-weight: 600;
+    background: transparent;
+    gap: 0;
+  }
+  .sidebar-logout-btn:hover {
+    background: rgba(239,68,68,0.1);
+    color: #fca5a5;
+    border-color: rgba(239,68,68,0.18);
+    transform: translateX(2px);
+  }
+  .sidebar-logout-btn i {
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 8px; margin-right: 10px; font-size: 0.82rem;
+    flex-shrink: 0; transition: color 0.2s, background 0.2s;
+    color: #ef4444; background: rgba(239,68,68,0.1);
+  }
+  .sidebar-logout-btn:hover i { background: rgba(239,68,68,0.2); color: #fca5a5; }
+  #admin-sidebar.collapsed .sidebar-logout-btn {
+    justify-content: center; padding: 10px 0;
+    margin-left: 3px; margin-right: 3px;
+  }
+  #admin-sidebar.collapsed .sidebar-logout-btn span { display: none; }
+  #admin-sidebar.collapsed .sidebar-logout-btn i { margin-right: 0; }
+  .dash-card {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+    padding: 0;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+  .dash-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.06), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
+    border-color: #cbd5e1;
+  }
+  .stat-card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    transition: transform 0.3s ease;
+  }
+  .dash-card:hover .stat-card-icon {
+    transform: scale(1.1) rotate(6deg);
+  }
+  .table-modern {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  .table-modern thead th {
+    background-color: #f8fafc;
+    color: #64748b;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 16px;
+    border-bottom: 1px solid #e2e8f0;
+    text-align: left;
+  }
+  .table-modern thead th:first-child {
+    border-top-left-radius: 0px;
+  }
+  .table-modern thead th:last-child {
+    border-top-right-radius: 0px;
+  }
+  .table-modern tbody td {
+    padding: 16px;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+    color: #334155;
+  }
+  .table-modern tbody tr:last-child td {
+    border-bottom: none;
+  }
+  .table-modern tbody tr:hover {
+    background-color: #f8fafc;
+  }
+  /* CSS ISSUE #1 FIX: hapus space-y-1 dari container, biarkan padding-bottom
+     pada .timeline-item yang mengatur spacing agar border-left sinkron */
+  .timeline-item {
+    position: relative;
+    padding-left: 22px;
+    padding-bottom: 18px;
+    border-left: 2px solid #e2e8f0;
+  }
+  .timeline-item:last-child {
+    border-left-color: transparent;
+    padding-bottom: 0;
+  }
+  .timeline-dot {
+    position: absolute;
+    left: -6px;
+    top: 2px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #cbd5e1;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 2px #f1f5f9;
+    transition: all 0.2s;
+  }
+  .timeline-item:hover .timeline-dot {
+    background: #3b82f6;
+    transform: scale(1.3);
+  }

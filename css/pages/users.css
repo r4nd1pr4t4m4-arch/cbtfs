@@ -1,0 +1,419 @@
+﻿/* =============================================================
+   users.css — User Management + Monitor Page
+   Sumber: index.html L1552-1967
+   ============================================================= */
+  /* ───── User Management Page ───── */
+  .um-tabbar{
+    background:#fff; border:1px solid #e2e8f0; border-radius:14px;
+    padding:6px; display:flex; gap:6px;
+  }
+  .um-tab{
+    flex:1; padding:10px 14px;
+    border-radius:10px; cursor:pointer;
+    font-size:13px; font-weight:700;
+    color:#64748b; background:transparent;
+    transition:all .15s; user-select:none;
+    display:inline-flex; align-items:center; justify-content:center; gap:6px;
+    border:none;
+  }
+  .um-tab:hover:not(.active){ background:#f1f5f9; color:#1e293b; }
+  .um-tab.active{
+    background:linear-gradient(135deg,#3b82f6,#1d4ed8); color:#fff;
+    box-shadow:0 2px 8px rgba(59,130,246,.3);
+  }
+  .um-tab .um-live-dot{
+    width:7px; height:7px; border-radius:50%;
+    background:#10b981; animation:lp-net-pulse 1.6s ease-in-out infinite;
+  }
+
+  /* ───── Monitor: Sisa Waktu, Progress Soal, Export ───── */
+  /* Sisa waktu per baris */
+
+  /* ── Violation Detail Panel ─────────────────────────────────────────── */
+  #viol-panel-overlay {
+    position: fixed; inset: 0; z-index: 300;
+    background: rgba(15,23,42,0.45); backdrop-filter: blur(3px);
+    display: none; align-items: flex-start; justify-content: flex-end;
+  }
+  #viol-panel-overlay.show { display: flex; animation: viol-slide-in .25s cubic-bezier(.4,0,.2,1); }
+  @keyframes viol-slide-in {
+    from { opacity:0; transform:translateX(40px); }
+    to   { opacity:1; transform:translateX(0); }
+  }
+  #viol-panel {
+    width: 100%; max-width: 480px;
+    height: 100vh; overflow-y: auto;
+    background: #fff;
+    box-shadow: -8px 0 40px rgba(15,23,42,.18);
+    display: flex; flex-direction: column;
+  }
+  #viol-panel-head {
+    padding: 18px 20px 14px;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+    position: sticky; top: 0; background: #fff; z-index: 1;
+  }
+  #viol-panel-body { padding: 16px 20px; flex: 1; }
+  .viol-row {
+    display: grid;
+    grid-template-columns: 7rem 1fr 1fr;
+    gap: 8px; align-items: start;
+    padding: 10px 0;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 12px;
+  }
+  .viol-row:last-child { border-bottom: none; }
+  .viol-row-time  { color: #64748b; font-variant-numeric: tabular-nums; font-weight: 600; font-size: 11px; }
+  .viol-row-jenis { color: #1e293b; font-weight: 700; }
+  .viol-row-detail{ color: #94a3b8; font-size: 11px; }
+  .viol-thead {
+    display: grid;
+    grid-template-columns: 7rem 1fr 1fr;
+    gap: 8px;
+    padding: 6px 0 8px;
+    border-bottom: 2px solid #e2e8f0;
+    font-size: 10px; font-weight: 800; color: #94a3b8;
+    text-transform: uppercase; letter-spacing: .05em;
+  }
+  .viol-empty {
+    text-align: center; padding: 32px 0; color: #94a3b8; font-size: 13px;
+  }
+  .viol-panel-close {
+    width: 32px; height: 32px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    background: #f1f5f9; border: none; cursor: pointer;
+    color: #64748b; font-size: 14px; flex-shrink: 0;
+    transition: background .15s;
+  }
+  .viol-panel-close:hover { background: #e2e8f0; color: #1e293b; }
+  .viol-clickable-badge {
+    cursor: pointer; transition: opacity .15s;
+  }
+  .viol-clickable-badge:hover { opacity: .75; }
+  /* ── End Violation Detail Panel ──────────────────────────────────────── */
+
+  .monitor-timer {
+    display:inline-flex; align-items:center; gap:5px;
+    font-size:11px; font-weight:800; font-variant-numeric:tabular-nums;
+    white-space:nowrap;
+  }
+  .monitor-timer.urgent { color:#dc2626; animation:monitor-blink .8s ease-in-out infinite; }
+  .monitor-timer.warning { color:#f59e0b; }
+  .monitor-timer.ok { color:#059669; }
+  .monitor-timer.done { color:#94a3b8; font-weight:600; }
+
+  /* Progress soal */
+  .monitor-prog-wrap {
+    display:flex; flex-direction:column; gap:3px; min-width:80px;
+  }
+  .monitor-prog-bar {
+    height:5px; background:#f1f5f9; border-radius:99px; overflow:hidden;
+  }
+  .monitor-prog-bar > div {
+    height:100%; border-radius:99px;
+    transition:width .4s ease;
+    background:linear-gradient(90deg,#6366f1,#8b5cf6);
+  }
+  .monitor-prog-bar > div.full { background:linear-gradient(90deg,#059669,#10b981); }
+  .monitor-prog-txt {
+    font-size:10px; font-weight:700; color:#64748b; white-space:nowrap;
+  }
+  .monitor-prog-txt .done { color:#059669; }
+
+  /* Tombol Export */
+  .monitor-export-btn {
+    display:inline-flex; align-items:center; gap:6px;
+    padding:7px 13px; border-radius:10px;
+    border:1px solid #e2e8f0; background:#fff; color:#475569;
+    font-size:12px; font-weight:700; cursor:pointer;
+    transition:all .15s;
+  }
+  .monitor-export-btn:hover {
+    background:#f0fdf4; border-color:#86efac; color:#16a34a;
+  }
+  /* Live mode toggle button */
+  .monitor-live-btn {
+    display:inline-flex; align-items:center; gap:7px;
+    padding:8px 14px; border-radius:10px; border:1px solid;
+    font-size:12px; font-weight:700; cursor:pointer;
+    transition:all .18s; user-select:none;
+  }
+  .monitor-live-btn.off {
+    background:#f1f5f9; border-color:#e2e8f0; color:#64748b;
+  }
+  .monitor-live-btn.off:hover { background:#e2e8f0; color:#334155; }
+  .monitor-live-btn.on {
+    background:linear-gradient(135deg,#059669,#10b981);
+    border-color:#059669; color:#fff;
+    box-shadow:0 2px 8px rgba(16,185,129,.35);
+  }
+  .monitor-live-btn.on:hover { background:linear-gradient(135deg,#047857,#059669); }
+  /* Dot berkedip di dalam tombol Live */
+  .monitor-live-btn .live-dot {
+    width:7px; height:7px; border-radius:50%; flex-shrink:0;
+    background:currentColor; opacity:.85;
+  }
+  .monitor-live-btn.on .live-dot {
+    animation: monitor-blink 1s ease-in-out infinite;
+  }
+  @keyframes monitor-blink {
+    0%,100%{ opacity:1; } 50%{ opacity:.3; }
+  }
+  /* Countdown ring */
+  .monitor-countdown-wrap {
+    display:none; align-items:center; gap:6px;
+    font-size:11px; font-weight:700; color:#059669;
+  }
+  .monitor-countdown-wrap.show { display:inline-flex; }
+  .monitor-countdown-ring {
+    width:28px; height:28px; flex-shrink:0;
+    transform:rotate(-90deg);
+  }
+  .monitor-countdown-ring circle {
+    fill:none; stroke-width:3;
+    stroke-linecap:round;
+  }
+  .monitor-countdown-ring .ring-bg  { stroke:#d1fae5; }
+  .monitor-countdown-ring .ring-fg  {
+    stroke:#10b981;
+    transition:stroke-dashoffset .9s linear;
+  }
+  /* Exam selector bar */
+  .monitor-exam-bar {
+    background:#fff; border:1px solid #e2e8f0; border-radius:16px;
+    padding:14px 18px;
+    display:flex; flex-direction:column; gap:12px;
+    box-shadow:0 1px 4px rgba(0,0,0,.05);
+  }
+  @media(min-width:640px){
+    .monitor-exam-bar { flex-direction:row; align-items:center; flex-wrap:wrap; gap:10px; }
+  }
+  .monitor-exam-label {
+    font-size:11px; font-weight:800; color:#64748b;
+    text-transform:uppercase; letter-spacing:.08em;
+    white-space:nowrap; flex-shrink:0;
+    display:flex; align-items:center; gap:6px;
+    background:#f1f5f9; border-radius:8px; padding:5px 10px;
+  }
+  .monitor-exam-chips {
+    display:flex; flex-wrap:wrap; gap:7px; flex:1;
+  }
+  .monitor-exam-chip {
+    display:inline-flex; align-items:center; gap:6px;
+    padding:7px 14px; border-radius:10px; border:1.5px solid;
+    font-size:12px; font-weight:700; cursor:pointer;
+    transition:all .18s cubic-bezier(.4,0,.2,1);
+    user-select:none; white-space:nowrap;
+  }
+  .monitor-exam-chip.all {
+    background:#f8fafc; border-color:#e2e8f0; color:#475569;
+  }
+  .monitor-exam-chip.all:hover {
+    background:#f1f5f9; border-color:#cbd5e1; color:#334155;
+    transform:translateY(-1px); box-shadow:0 2px 6px rgba(0,0,0,.07);
+  }
+  .monitor-exam-chip.all.active {
+    background:#0f172a; border-color:#0f172a; color:#fff;
+    box-shadow:0 3px 10px rgba(15,23,42,.3);
+  }
+  .monitor-exam-chip.exam {
+    background:#eff6ff; border-color:#bfdbfe; color:#1d4ed8;
+  }
+  .monitor-exam-chip.exam:hover {
+    background:#dbeafe; border-color:#93c5fd;
+    transform:translateY(-1px); box-shadow:0 2px 8px rgba(37,99,235,.15);
+  }
+  .monitor-exam-chip.exam.active {
+    background:linear-gradient(135deg,#2563eb,#4f46e5);
+    border-color:transparent; color:#fff;
+    box-shadow:0 4px 12px rgba(37,99,235,.4);
+    transform:translateY(-1px);
+  }
+  .monitor-exam-chip .chip-dot {
+    width:7px; height:7px; border-radius:50%;
+    background:currentColor; opacity:.7; flex-shrink:0;
+    animation: monitor-blink 1.4s ease-in-out infinite;
+  }
+  .monitor-exam-chip.active .chip-dot { opacity:1; }
+  /* sv-exam-bar (Pengawas) */
+  .sv-exam-bar {
+    background:#fff; border:1px solid #e2e8f0; border-radius:16px;
+    padding:14px 18px; display:flex; flex-direction:column; gap:12px;
+    box-shadow:0 1px 4px rgba(0,0,0,.05);
+  }
+  @media(min-width:640px){
+    .sv-exam-bar { flex-direction:row; align-items:center; flex-wrap:wrap; gap:10px; }
+  }
+  .sv-exam-label {
+    font-size:11px; font-weight:800; color:#64748b;
+    text-transform:uppercase; letter-spacing:.08em;
+    white-space:nowrap; flex-shrink:0;
+    display:flex; align-items:center; gap:6px;
+    background:#f1f5f9; border-radius:8px; padding:5px 10px;
+  }
+  .sv-exam-chips { display:flex; flex-wrap:wrap; gap:7px; flex:1; }
+  .sv-exam-chip {
+    display:inline-flex; align-items:center; gap:6px;
+    padding:7px 14px; border-radius:10px; border:1.5px solid;
+    font-size:12px; font-weight:700; cursor:pointer;
+    transition:all .18s cubic-bezier(.4,0,.2,1);
+    user-select:none; white-space:nowrap;
+  }
+  .sv-exam-chip.all {
+    background:#f8fafc; border-color:#e2e8f0; color:#475569;
+  }
+  .sv-exam-chip.all:hover {
+    background:#f1f5f9; border-color:#cbd5e1; color:#334155;
+    transform:translateY(-1px); box-shadow:0 2px 6px rgba(0,0,0,.07);
+  }
+  .sv-exam-chip.all.active {
+    background:#0f172a; border-color:#0f172a; color:#fff;
+    box-shadow:0 3px 10px rgba(15,23,42,.3);
+  }
+  .sv-exam-chip.exam {
+    background:#eff6ff; border-color:#bfdbfe; color:#1d4ed8;
+  }
+  .sv-exam-chip.exam:hover {
+    background:#dbeafe; border-color:#93c5fd;
+    transform:translateY(-1px); box-shadow:0 2px 8px rgba(37,99,235,.15);
+  }
+  .sv-exam-chip.exam.active {
+    background:linear-gradient(135deg,#2563eb,#4f46e5);
+    border-color:transparent; color:#fff;
+    box-shadow:0 4px 12px rgba(37,99,235,.4);
+    transform:translateY(-1px);
+  }
+  .sv-exam-chip .chip-dot {
+    width:7px; height:7px; border-radius:50%;
+    background:currentColor; opacity:.7; flex-shrink:0;
+    animation: monitor-blink 1.4s ease-in-out infinite;
+  }
+  .sv-exam-chip.active .chip-dot { opacity:1; }
+  .sv-exam-single {
+    display:inline-flex; align-items:center; gap:10px;
+    background:linear-gradient(135deg,#eff6ff,#eef2ff);
+    border:1.5px solid #bfdbfe; border-radius:12px; padding:8px 16px;
+    transition:box-shadow .18s;
+  }
+  .sv-exam-single:hover { box-shadow:0 3px 10px rgba(37,99,235,.15); }
+  .sv-exam-single-subject {
+    font-size:14px; font-weight:800; color:#1e3a8a;
+  }
+  .sv-exam-single-kelas {
+    font-size:11px; color:#6366f1; opacity:.8; font-weight:600;
+  }
+  .sv-exam-pin {
+    display:inline-flex; align-items:center; gap:4px;
+    background:linear-gradient(135deg,#312e81,#4338ca);
+    color:#fff; border-radius:20px; padding:3px 11px;
+    font-size:11px; font-weight:800; letter-spacing:.05em; margin-left:4px;
+  }
+  .sv-no-exam {
+    font-size:12px; color:#94a3b8; font-style:italic;
+    display:flex; align-items:center; gap:6px;
+  }
+  .monitor-exam-empty {
+    font-size:12px; color:#94a3b8; font-style:italic;
+    display:flex; align-items:center; gap:5px;
+  }
+  /* Highlight baris yang baru berubah status */
+  @keyframes monitor-row-flash {
+    0%   { background:#fef9c3; }
+    100% { background:transparent; }
+  }
+  .monitor-row-changed {
+    animation: monitor-row-flash 2.5s ease-out forwards;
+  }
+
+  /* ── Notifikasi Popup Siswa ────────────────────────────────── */
+  #student-notif-container {
+    position: fixed;
+    bottom: 80px;
+    right: 16px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 10px;
+    pointer-events: none;
+    max-width: 360px;
+    width: calc(100vw - 32px);
+  }
+  .student-notif-toast {
+    background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%);
+    color: #fff;
+    border-radius: 14px;
+    padding: 14px 16px;
+    box-shadow: 0 8px 32px rgba(15,23,42,.45);
+    pointer-events: auto;
+    animation: notif-slide-in .35s cubic-bezier(.34,1.56,.64,1) both;
+    border: 1px solid rgba(255,255,255,.18);
+    position: relative;
+    overflow: hidden;
+  }
+  .student-notif-toast.removing {
+    animation: notif-slide-out .3s ease-in both;
+  }
+  @keyframes notif-slide-in {
+    from { opacity:0; transform:translateX(60px) scale(.92); }
+    to   { opacity:1; transform:translateX(0)    scale(1);   }
+  }
+  @keyframes notif-slide-out {
+    from { opacity:1; transform:translateX(0) scale(1); max-height:200px; }
+    to   { opacity:0; transform:translateX(60px) scale(.9); max-height:0; padding:0; margin:0; }
+  }
+  .student-notif-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: rgba(255,255,255,.75);
+  }
+  .student-notif-header .notif-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #fbbf24;
+    animation: monitor-blink 1s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+  .student-notif-body {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.5;
+    color: #fff;
+    word-break: break-word;
+  }
+  .student-notif-footer {
+    margin-top: 8px;
+    font-size: 10px;
+    color: rgba(255,255,255,.55);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .student-notif-close {
+    position: absolute;
+    top: 8px; right: 8px;
+    background: rgba(255,255,255,.15);
+    border: none; border-radius: 6px;
+    width: 22px; height: 22px;
+    color: #fff; cursor: pointer;
+    font-size: 10px;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .15s;
+  }
+  .student-notif-close:hover { background: rgba(255,255,255,.3); }
+  .student-notif-progress {
+    position: absolute;
+    bottom: 0; left: 0;
+    height: 3px;
+    background: rgba(255,255,255,.4);
+    border-radius: 0 0 0 14px;
+    animation: notif-progress-shrink var(--notif-duration, 8s) linear forwards;
+  }
+  @keyframes notif-progress-shrink {
+    from { width: 100%; }
+    to   { width: 0%; }
+  }

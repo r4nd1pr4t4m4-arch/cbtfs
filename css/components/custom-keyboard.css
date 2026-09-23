@@ -1,0 +1,321 @@
+﻿/* =============================================================
+   custom-keyboard.css — Custom Keyboard Esai (.ck-*)
+   Sumber: index.html L6422-6739
+   ============================================================= */
+  /* ═══════════════════════════════════════════════════
+     CUSTOM KEYBOARD ESAI
+     ═══════════════════════════════════════════════════ */
+  .ck-wrapper {
+    background: #e8ecf0;
+    border: 1px solid #c8d0da;
+    border-top: none;
+    border-radius: 0 0 14px 14px;
+    padding: 6px 4px 8px;
+    user-select: none;
+    -webkit-user-select: none;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+    position: relative;
+  }
+  /* Tab bar */
+  .ck-tab-bar {
+    display: flex;
+    gap: 3px;
+    padding: 0 4px 5px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .ck-tab-bar::-webkit-scrollbar { display: none; }
+  .ck-tab {
+    flex-shrink: 0;
+    padding: 4px 10px;
+    border-radius: 8px 8px 0 0;
+    font-size: 11px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: #d0d7e0;
+    color: #64748b;
+    letter-spacing: 0.02em;
+  }
+  .ck-tab.active {
+    background: #ffffff;
+    color: #1e40af;
+    box-shadow: 0 -2px 6px rgba(0,0,0,0.06);
+  }
+  .ck-tab:hover:not(.active) { background: #c4ccd6; color: #475569; }
+
+  /* Panel */
+  .ck-panel { display: none; }
+  .ck-panel.active { display: block; }
+
+  /* Generic key button */
+  .ck-key {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 30px;
+    height: 42px;
+    padding: 0 6px;
+    border-radius: 8px;
+    border: none;
+    background: #ffffff;
+    color: #1e293b;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 2px 0 #b0bac5, 0 1px 3px rgba(0,0,0,0.12);
+    transition: all 0.08s;
+    font-family: 'Inter', sans-serif;
+    line-height: 1;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .ck-key:active, .ck-key.pressed {
+    transform: translateY(1px);
+    box-shadow: 0 1px 0 #b0bac5;
+    background: #e8ecf0;
+  }
+  .ck-key.special {
+    background: #c8d4e0;
+    color: #334155;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .ck-key.special:active { background: #b8c4d0; }
+  .ck-key.action {
+    background: #3b82f6;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    box-shadow: 0 2px 0 #1d4ed8, 0 1px 3px rgba(0,0,0,0.15);
+  }
+  .ck-key.action:active { background: #2563eb; box-shadow: 0 1px 0 #1d4ed8; }
+  .ck-key.danger {
+    background: #fee2e2;
+    color: #dc2626;
+    font-size: 13px;
+    box-shadow: 0 2px 0 #fca5a5, 0 1px 3px rgba(0,0,0,0.08);
+  }
+  .ck-key.danger:active { background: #fecaca; box-shadow: 0 1px 0 #fca5a5; }
+  .ck-key.shift-active {
+    background: #fef3c7;
+    color: #92400e;
+    box-shadow: 0 2px 0 #fde68a, 0 1px 3px rgba(0,0,0,0.1);
+  }
+  .ck-key.space-key {
+    min-width: 120px;
+    flex: 1;
+    font-size: 11px;
+    color: #94a3b8;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+  .ck-key.enter-key {
+    min-width: 60px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .ck-key.sym-key {
+    font-size: 11px;
+    font-weight: 700;
+    min-width: 34px;
+    background: #f8fafc;
+  }
+  .ck-key.math-tpl {
+    font-size: 10px;
+    font-weight: 700;
+    color: #7c3aed;
+    border: 1.5px solid #ddd6fe;
+    background: #faf5ff;
+    box-shadow: 0 2px 0 #c4b5fd, 0 1px 3px rgba(0,0,0,0.08);
+    min-width: 44px;
+    height: 36px;
+  }
+  .ck-key.math-tpl:active { background: #ede9fe; }
+  .ck-key.math-sym {
+    font-size: 13px;
+    min-width: 34px;
+    height: 36px;
+    font-family: 'Times New Roman', serif;
+  }
+  .ck-key.arabic {
+    font-family: 'Scheherazade New', 'Traditional Arabic', serif;
+    font-size: 18px;
+    min-width: 34px;
+  }
+  .ck-key.harakat {
+    font-size: 16px;
+    min-width: 34px;
+    color: #065f46;
+    background: #ecfdf5;
+    box-shadow: 0 2px 0 #a7f3d0;
+  }
+  .ck-key.lang-switch {
+    background: linear-gradient(135deg, #1d4ed8 0%, #7c3aed 100%);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+    min-width: 46px;
+    box-shadow: 0 2px 0 #1e40af;
+  }
+  .ck-key.lang-switch:active { opacity: 0.85; }
+
+  /* Keyboard rows */
+  .ck-row {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    margin-bottom: 4px;
+  }
+  .ck-row:last-child { margin-bottom: 0; }
+
+  /* Math sub-tabs */
+  .ck-math-subtabs {
+    display: flex;
+    gap: 3px;
+    flex-wrap: wrap;
+    padding: 4px 2px 6px;
+  }
+  .ck-math-stab {
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    border: 1.5px solid #e2e8f0;
+    background: white;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.12s;
+    white-space: nowrap;
+  }
+  .ck-math-stab.active { background: #2563eb; border-color: #2563eb; color: white; }
+  .ck-math-stab:hover:not(.active) { background: #eff6ff; border-color: #93c5fd; }
+
+  .ck-math-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 2px 2px 4px;
+    max-height: 160px;
+    overflow-y: auto;
+  }
+
+  /* Preview box untuk math */
+  .ck-preview-box {
+    margin: 5px 2px 2px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1.5px solid #bfdbfe;
+    background: linear-gradient(135deg,#eff6ff 0%,#f0f9ff 100%);
+    min-height: 36px;
+    font-size: 13px;
+    color: #1e293b;
+    word-break: break-word;
+    line-height: 1.8;
+  }
+  .ck-preview-box.hidden { display: none; }
+
+  /* Close button */
+  .ck-close-btn {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0,0,0,0.12);
+    color: #475569;
+    font-size: 11px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+    transition: background 0.15s;
+  }
+  .ck-close-btn:hover { background: rgba(0,0,0,0.22); color: #dc2626; }
+
+  /* Textarea saat custom keyboard aktif */
+  textarea.ck-active-ta {
+    border-radius: 12px 12px 0 0 !important;
+    border-bottom-color: #3b82f6 !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.15) inset !important;
+  }
+
+  /* ── Essay textarea: auto-grow + manual resize ── */
+  .essay-text-area {
+    display: block;
+    overflow: hidden;
+    resize: none;
+    min-height: 44px;
+    max-height: 70vh;
+    transition: height 0.08s ease;
+    box-sizing: border-box;
+  }
+
+  /* Container relatif untuk drag handle */
+  .essay-ta-wrap {
+    position: relative;
+    width: 100%;
+  }
+
+  /* Drag handle — strip abu di bawah textarea */
+  .essay-ta-drag-handle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 18px;
+    background: #e2e8f0;
+    border: 1px solid #cbd5e1;
+    border-top: none;
+    border-radius: 0 0 10px 10px;
+    cursor: ns-resize;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+    gap: 3px;
+    transition: background 0.15s;
+    flex-shrink: 0;
+  }
+  .essay-ta-drag-handle:hover,
+  .essay-ta-drag-handle.dragging {
+    background: #bfdbfe;
+    border-color: #93c5fd;
+  }
+  .essay-ta-drag-handle span {
+    display: block;
+    width: 28px;
+    height: 3px;
+    border-radius: 99px;
+    background: #94a3b8;
+  }
+  .essay-ta-drag-handle:hover span,
+  .essay-ta-drag-handle.dragging span {
+    background: #3b82f6;
+  }
+  /* Saat keyboard terbuka: border-radius atas textarea menjadi square */
+  .essay-ta-wrap.kb-open .essay-text-area {
+    border-radius: 12px 12px 0 0 !important;
+    border-bottom-color: #3b82f6 !important;
+  }
+  /* Drag handle ikut berubah border saat keyboard terbuka */
+  .essay-ta-wrap.kb-open .essay-ta-drag-handle {
+    border-color: #93c5fd;
+    background: #dbeafe;
+  }
+
+  /* Responsive: layar sempit */
+  @media (max-width: 380px) {
+    .ck-key { min-width: 26px; height: 38px; font-size: 13px; padding: 0 3px; }
+    .ck-row { gap: 3px; }
+    .ck-key.arabic { font-size: 16px; min-width: 30px; }
+  }
+  @media (max-width: 320px) {
+    .ck-key { min-width: 22px; height: 36px; font-size: 12px; padding: 0 2px; }
+    .ck-row { gap: 2px; }
+  }

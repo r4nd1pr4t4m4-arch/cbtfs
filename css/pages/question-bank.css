@@ -1,0 +1,570 @@
+﻿/* =============================================================
+   question-bank.css — Question Bank Extra Styles
+   Sumber: index.html L20755-21320
+   ============================================================= */
+      <style id="batch-multi-tipe-styles">
+        /* Container default — kelonggaran teme purple lembut, agar kartu summary kontras */
+        #form-batch-q.batch-form-shell {
+          border-color: #ddd6fe;
+          background: linear-gradient(180deg, #ffffff 0%, #faf5ff 100%);
+        }
+        /* Sticky action bar respect notch / gesture nav */
+        #batch-action-bar {
+          padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+          backdrop-filter: saturate(120%) blur(6px);
+          -webkit-backdrop-filter: saturate(120%) blur(6px);
+        }
+        /* Progress bar tipis di tepi atas action bar */
+        #batch-progress-bar {
+          height: 2px;
+          background: linear-gradient(90deg, #7c3aed 0%, #a78bfa 100%);
+          width: 0%;
+          transition: width 200ms ease-out;
+        }
+        /* xs (< 360px) — padding lebih ramping, judul sub disembunyikan */
+        @media (max-width: 359px) {
+          #form-batch-q.batch-form-shell { padding: 12px; }
+          #form-batch-q .batch-header-subtitle { display: none; }
+          #form-batch-q .batch-action-label { display: none; }
+          #batch-textarea-wrapper textarea { min-height: 280px; }
+        }
+        /* sm 360–639 — tetap stacked, padding 12px */
+        @media (min-width: 360px) and (max-width: 639px) {
+          #form-batch-q.batch-form-shell { padding: 12px; }
+          #form-batch-q .batch-header-subtitle { display: none; }
+          #batch-textarea-wrapper textarea { min-height: 280px; }
+        }
+        /* md 640–767 — single col, drawer panduan & summary */
+        @media (min-width: 640px) and (max-width: 767px) {
+          #form-batch-q.batch-form-shell { padding: 16px; }
+          #batch-textarea-wrapper textarea { min-height: 320px; }
+        }
+        /* lg 768–1023 — 2 kolom (textarea + summary) */
+        @media (min-width: 768px) and (max-width: 1023px) {
+          #form-batch-q.batch-form-shell { padding: 20px; }
+          #batch-textarea-wrapper textarea { min-height: 360px; }
+        }
+        /* xl 1024–1279 — 3 kolom 25 / 50 / 25 */
+        @media (min-width: 1024px) and (max-width: 1279px) {
+          #form-batch-q.batch-form-shell { padding: 24px; }
+          #batch-textarea-wrapper textarea { min-height: 420px; }
+        }
+        /* 2xl 1280–1535 — 3 kolom 28 / 44 / 28 */
+        @media (min-width: 1280px) and (max-width: 1535px) {
+          #form-batch-q.batch-form-shell { padding: 28px; }
+          #batch-textarea-wrapper textarea { min-height: 480px; }
+        }
+        /* 3xl ≥ 1536 — 3 kolom 32 / 36 / 32 dalam container 1600px ter-center */
+        @media (min-width: 1536px) {
+          #form-batch-q.batch-form-shell {
+            padding: 28px;
+            max-width: 1600px;
+            margin-left: auto;
+            margin-right: auto;
+          }
+          #batch-grid-area {
+            grid-template-columns: 32% 36% 32% !important;
+          }
+          #batch-textarea-wrapper textarea { min-height: 520px; }
+        }
+        /* Hover hanya di pointer presisi */
+        @media (hover: hover) and (pointer: fine) {
+          #form-batch-q .batch-action-btn:hover { transform: translateY(-1px); }
+        }
+        /* Tap highlight off + transisi pendek saat ditekan */
+        #form-batch-q .batch-action-btn,
+        #form-batch-q [role="button"],
+        #form-batch-q button {
+          -webkit-tap-highlight-color: transparent;
+          transition: background-color 120ms, transform 120ms, box-shadow 120ms;
+        }
+        /* Akordeon <details> styling minimal — Task 5.2 akan refine */
+        #form-batch-q details.batch-collapse > summary {
+          cursor: pointer;
+          list-style: none;
+          user-select: none;
+        }
+        #form-batch-q details.batch-collapse > summary::-webkit-details-marker { display: none; }
+
+        /* ===== Task 5.2 — Tabbed Format Guide ===== */
+        .batch-format-tab {
+          padding: 6px 10px;
+          border-bottom: 2px solid transparent;
+          color: #64748b;             /* slate-500 */
+          font-weight: 600;
+          font-size: 12px;
+          border-radius: 6px 6px 0 0;
+        }
+        .batch-format-tab[aria-selected="true"] {
+          color: var(--bsfg-color, #2563eb);
+          border-bottom-color: var(--bsfg-color, #2563eb);
+          background-color: var(--bsfg-soft, #dbeafe);
+        }
+        .batch-format-tab:focus { outline: 2px solid #a78bfa; outline-offset: 2px; }
+        .batch-format-example {
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
+          border-radius: 8px;
+          padding: 10px;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+          font-size: 11px;
+          line-height: 1.55;
+          white-space: pre-wrap;
+          overflow-x: auto;
+        }
+        .batch-format-rules {
+          background: #faf5ff;
+          border: 1px solid #ede9fe;
+          border-radius: 8px;
+          padding: 10px;
+          margin-top: 10px;
+          font-size: 11.5px;
+          color: #4c1d95;
+        }
+        .batch-format-action-btn {
+          font-size: 11px;
+          padding: 4px 8px;
+          border-radius: 6px;
+          font-weight: 600;
+          border: 1px solid #e2e8f0;
+          background: #ffffff;
+          color: #475569;
+        }
+        .batch-format-action-btn:hover { background: #f1f5f9; }
+        .batch-format-toast {
+          font-size: 11px;
+          color: #15803d;
+          margin-left: 6px;
+          opacity: 0;
+          transition: opacity 200ms;
+        }
+        .batch-format-toast.show { opacity: 1; }
+        /* Mobile accordion items per tipe */
+        #form-batch-q .batch-format-mobile-item {
+          border: 1px solid #ede9fe;
+          border-radius: 8px;
+          background: #ffffff;
+        }
+        #form-batch-q .batch-format-mobile-item > summary.batch-format-mobile-summary {
+          list-style: none;
+          cursor: pointer;
+          user-select: none;
+          padding: 8px 12px;
+          font-weight: 600;
+          font-size: 12px;
+          color: #4c1d95;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 8px;
+        }
+        #form-batch-q .batch-format-mobile-item > summary.batch-format-mobile-summary::-webkit-details-marker { display: none; }
+        #form-batch-q .batch-format-mobile-item > .batch-format-mobile-body {
+          padding: 8px 12px 12px;
+          border-top: 1px solid #ede9fe;
+        }
+
+        /* ===== Smart Textarea (Task 5.3) ===== */
+        .batch-toolbar-btn {
+          font-size: 11px;
+          padding: 6px 8px;
+          border-radius: 6px;
+          font-weight: 600;
+          border: 1px solid #e2e8f0;
+          background: #ffffff;
+          color: #475569;
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          min-height: 36px;
+          cursor: pointer;
+          transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease;
+        }
+        .batch-toolbar-btn:hover { background: #f1f5f9; }
+        .batch-toolbar-btn:focus-visible { outline: 2px solid #7c3aed; outline-offset: 2px; }
+        .batch-toolbar-btn-danger { color: #b91c1c; }
+        .batch-toolbar-btn-danger:hover { background: #fee2e2; }
+
+        #batch-toolbar-insert-menu li {
+          display: block;
+        }
+        #batch-toolbar-insert-menu button {
+          width: 100%;
+          text-align: left;
+          padding: 6px 8px;
+          background: transparent;
+          border: 0;
+          font-size: 11px;
+          color: #334155;
+          border-radius: 4px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+        #batch-toolbar-insert-menu button:hover { background: #f3e8ff; color: #6d28d9; }
+        #batch-toolbar-insert-menu button:focus-visible { outline: 2px solid #7c3aed; outline-offset: 2px; }
+        #batch-toolbar-insert-menu .bsm-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 999px;
+          flex: 0 0 8px;
+        }
+
+        .batch-editor {
+          display: grid;
+          grid-template-columns: 48px 1fr;
+          background: #ffffff;
+          border: 2px solid #ddd6fe;
+          border-radius: 12px;
+          overflow: hidden;
+          /* Cegah mobile (iOS/Android) menggelembungkan ukuran teks secara
+             otomatis dengan faktor berbeda antara kolom nomor (sempit) dan
+             textarea (lebar) — penyebab nomor baris tidak sejajar di mobile. */
+          -webkit-text-size-adjust: 100%;
+          text-size-adjust: 100%;
+        }
+        .batch-editor:focus-within { border-color: #7c3aed; }
+        .batch-gutter {
+          margin: 0;
+          padding: 16px 6px 16px 12px;
+          background: #faf5ff;
+          border-right: 1px solid #ede9fe;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+          font-size: 13px;
+          line-height: 19.5px;
+          color: #94a3b8;
+          white-space: pre;
+          text-align: right;
+          user-select: none;
+          overflow: hidden;
+          align-self: stretch;
+          -webkit-text-size-adjust: 100%;
+          text-size-adjust: 100%;
+        }
+        .batch-gutter .gutter-scroll {
+          display: block;
+          will-change: transform;
+        }
+        .batch-gutter .gutter-line {
+          display: block;
+          height: 19.5px;
+          min-height: 19.5px;
+          line-height: 19.5px;
+        }
+        .batch-gutter .gutter-badge {
+          display: inline-block;
+          margin-right: 4px;
+          padding: 0 5px;
+          font-size: 9px;
+          line-height: 14px;
+          border-radius: 4px;
+          font-weight: 700;
+          vertical-align: middle;
+          letter-spacing: 0.02em;
+        }
+        #batch-editor textarea#batch-input-text {
+          border: none !important;
+          border-radius: 0 !important;
+          width: 100%;
+          resize: vertical;
+          outline: none !important;
+          padding: 16px 12px;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+          font-size: 13px;
+          line-height: 19.5px;
+          box-shadow: none !important;
+          -webkit-text-size-adjust: 100%;
+          text-size-adjust: 100%;
+        }
+        .batch-counter-warning { color: #d97706 !important; font-weight: 600; }
+        .batch-counter-danger { color: #b91c1c !important; font-weight: 700; }
+        #batch-input-toast { position: absolute; right: 8px; bottom: 8px; }
+
+        /* ===== Live Summary Panel (Task 5.4) ===== */
+        /* Status pill */
+        .batch-summary-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 3px 10px;
+          border-radius: 999px;
+          font-size: 10.5px;
+          font-weight: 700;
+          letter-spacing: 0.02em;
+          border: 1px solid transparent;
+          white-space: nowrap;
+        }
+        .batch-summary-pill-idle    { background: #f1f5f9; color: #475569; border-color: #e2e8f0; }
+        .batch-summary-pill-parsing { background: #dbeafe; color: #1d4ed8; border-color: #bfdbfe; }
+        .batch-summary-pill-valid   { background: #dcfce7; color: #15803d; border-color: #bbf7d0; }
+        .batch-summary-pill-partial { background: #fef3c7; color: #b45309; border-color: #fde68a; }
+        .batch-summary-pill-error   { background: #fee2e2; color: #b91c1c; border-color: #fecaca; }
+        .batch-summary-pill-parsing .fa-circle-notch,
+        .batch-summary-pill-parsing .fa-spinner {
+          animation: bsm-spin 0.9s linear infinite;
+        }
+        @keyframes bsm-spin {
+          from { transform: rotate(0deg); }
+          to   { transform: rotate(360deg); }
+        }
+        /* Counter cards */
+        .batch-summary-counter {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 8px 4px;
+          border-radius: 10px;
+          border: 1px solid transparent;
+          background: #f8fafc;
+          line-height: 1.1;
+          min-height: 56px;
+        }
+        .batch-summary-counter .num {
+          font-size: 22px;
+          font-weight: 800;
+          font-variant-numeric: tabular-nums;
+          line-height: 1;
+        }
+        .batch-summary-counter .lbl {
+          margin-top: 4px;
+          font-size: 10px;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+          opacity: 0.8;
+        }
+        .batch-counter-valid   { background: #ecfdf5; border-color: #a7f3d0; color: #047857; }
+        .batch-counter-invalid { background: #fff1f2; border-color: #fecdd3; color: #be123c; }
+        .batch-counter-total   { background: #f1f5f9; border-color: #cbd5e1; color: #334155; }
+
+        /* Lists Soal_Valid / Soal_Invalid */
+        .batch-summary-list {
+          border: 1px solid #e2e8f0;
+          border-radius: 10px;
+          margin-bottom: 8px;
+          background: #ffffff;
+          overflow: hidden;
+        }
+        .batch-summary-list-summary {
+          list-style: none;
+          cursor: pointer;
+          user-select: none;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 8px;
+          padding: 8px 10px;
+          font-weight: 700;
+          font-size: 12px;
+          background: #f8fafc;
+          border-bottom: 1px solid transparent;
+        }
+        .batch-summary-list-summary::-webkit-details-marker { display: none; }
+        .batch-summary-list-summary::before {
+          content: '\f054'; /* fa-chevron-right */
+          font-family: 'Font Awesome 6 Free', 'Font Awesome 5 Free', FontAwesome;
+          font-weight: 900;
+          font-size: 9px;
+          opacity: 0.5;
+          margin-right: 4px;
+          transition: transform 150ms ease;
+          display: inline-block;
+        }
+        .batch-summary-list[open] > .batch-summary-list-summary::before {
+          transform: rotate(90deg);
+        }
+        .batch-summary-list[open] > .batch-summary-list-summary {
+          border-bottom-color: #e2e8f0;
+        }
+        .batch-summary-list-count {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-width: 22px;
+          height: 18px;
+          padding: 0 6px;
+          border-radius: 999px;
+          font-size: 10.5px;
+          font-weight: 800;
+          background: #ffffff;
+          border: 1px solid currentColor;
+        }
+        .batch-summary-list-body {
+          margin: 0;
+          padding: 0;
+          list-style: none;
+          max-height: 280px;
+          overflow-y: auto;
+        }
+        .batch-summary-list-body li {
+          padding: 8px 10px;
+          border-bottom: 1px solid #f1f5f9;
+          font-size: 11.5px;
+          color: #334155;
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+        .batch-summary-list-body li:last-child { border-bottom: 0; }
+        .batch-summary-list-body li:hover { background: #faf5ff; }
+        .batch-summary-list-body li.empty {
+          color: #94a3b8;
+          font-style: italic;
+          text-align: center;
+          justify-content: center;
+        }
+        .batch-summary-row-head {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          flex-wrap: wrap;
+          justify-content: space-between;
+        }
+        .batch-summary-row-head-left {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          flex-wrap: wrap;
+          min-width: 0;
+          flex: 1 1 auto;
+        }
+        .batch-summary-snippet {
+          color: #475569;
+          font-size: 11px;
+          flex: 1 1 100%;
+        }
+        .batch-summary-errors {
+          margin: 2px 0 0;
+          padding-left: 18px;
+          color: #b91c1c;
+          font-size: 11px;
+          line-height: 1.45;
+        }
+        .batch-summary-errors li {
+          padding: 0;
+          border: 0;
+          background: transparent;
+          display: list-item;
+          list-style: disc;
+          color: #b91c1c;
+        }
+        .batch-summary-block-num {
+          font-weight: 700;
+          color: #6d28d9;
+          font-size: 11px;
+        }
+        .batch-summary-type-badge {
+          display: inline-flex;
+          align-items: center;
+          padding: 1px 6px;
+          border-radius: 4px;
+          font-size: 9.5px;
+          font-weight: 800;
+          letter-spacing: 0.02em;
+          line-height: 1.4;
+          border: 1px solid transparent;
+        }
+        .batch-summary-type-badge-unknown {
+          background: #f1f5f9;
+          color: #64748b;
+          border-color: #cbd5e1;
+        }
+        .batch-summary-meta-tag {
+          display: inline-flex;
+          align-items: center;
+          padding: 1px 5px;
+          border-radius: 4px;
+          font-size: 9.5px;
+          font-weight: 600;
+          background: #f1f5f9;
+          color: #475569;
+          border: 1px solid #e2e8f0;
+        }
+        .batch-summary-meta-tag.req {
+          background: #fef3c7;
+          color: #92400e;
+          border-color: #fde68a;
+        }
+        .batch-summary-jump-btn {
+          flex-shrink: 0;
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          font-size: 10.5px;
+          font-weight: 700;
+          padding: 3px 7px;
+          border-radius: 6px;
+          background: #f5f3ff;
+          color: #6d28d9;
+          border: 1px solid #ddd6fe;
+          cursor: pointer;
+          transition: background-color 120ms, color 120ms;
+        }
+        .batch-summary-jump-btn:hover {
+          background: #6d28d9;
+          color: #ffffff;
+          border-color: #6d28d9;
+        }
+        .batch-summary-jump-btn:focus-visible {
+          outline: 2px solid #7c3aed;
+          outline-offset: 1px;
+        }
+        /* Konfigurasi Ujian */
+        #batch-summary-config-body .batch-cfg-row {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          flex-wrap: wrap;
+          margin-top: 2px;
+        }
+        #batch-summary-config-body .batch-cfg-disabled {
+          background: #fee2e2;
+          color: #b91c1c;
+          border: 1px solid #fecaca;
+          border-radius: 4px;
+          padding: 0 5px;
+          font-size: 10px;
+          font-weight: 700;
+        }
+        #batch-summary-config-body .batch-cfg-quota-warn { color: #b45309; font-weight: 700; }
+        #batch-summary-config-body .batch-cfg-quota-full { color: #b91c1c; font-weight: 800; }
+
+        /* Donut legend swatch */
+        #batch-summary-legend li {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+        #batch-summary-legend .bsl-swatch {
+          width: 10px;
+          height: 10px;
+          border-radius: 2px;
+          flex: 0 0 10px;
+          display: inline-block;
+        }
+        #batch-summary-legend .bsl-name { color: #334155; flex: 1; }
+        #batch-summary-legend .bsl-count {
+          font-variant-numeric: tabular-nums;
+          color: #64748b;
+          font-weight: 600;
+        }
+
+        /* Highlight effect untuk "Lompat ke baris" */
+        #batch-editor.batch-textarea-highlight {
+          animation: bsm-textarea-glow 3s ease-out;
+        }
+        @keyframes bsm-textarea-glow {
+          0%   { box-shadow: 0 0 0 0 rgba(250, 204, 21, 0); border-color: #ddd6fe; }
+          15%  { box-shadow: 0 0 0 6px rgba(250, 204, 21, 0.55); border-color: #facc15; }
+          70%  { box-shadow: 0 0 0 4px rgba(250, 204, 21, 0.25); border-color: #fde047; }
+          100% { box-shadow: 0 0 0 0 rgba(250, 204, 21, 0); border-color: #ddd6fe; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .batch-summary-pill-parsing .fa-circle-notch,
+          .batch-summary-pill-parsing .fa-spinner { animation: none; }
+          #batch-editor.batch-textarea-highlight { animation: none; box-shadow: 0 0 0 4px rgba(250, 204, 21, 0.5); }
+        }
+      </style>
