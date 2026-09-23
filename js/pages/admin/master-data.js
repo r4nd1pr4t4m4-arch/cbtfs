@@ -1,4 +1,4 @@
-﻿/**
+/**
  * master-data.js — Halaman Data Master
  * renderMasterDataPage() + _md* helpers
  * Sumber: index.html L16834-17439
@@ -597,15 +597,3 @@ function _mdSave() {
       .saveMasterData(cur, currentUser.userID, currentUser.token);
   });
 }
-
-// Backwards-compat shims (old inline calls)
-function addMasterItem(inputId, containerId, listType) {
-  // listType is 'class' or 'subject'
-  const inp = document.getElementById(inputId);
-  if (!inp) return;
-  // Move value to new structured input
-  const target = document.getElementById('md-input-' + listType);
-  if (target) target.value = inp.value;
-  _mdAddItem(listType);
-}
-function handleSaveMasterData() { _mdSave(); }
