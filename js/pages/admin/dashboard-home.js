@@ -1,4 +1,4 @@
-﻿/**
+/**
  * dashboard-home.js — Dashboard Overview
  * renderAdminHome() + _dashRelTime, _examLiveStatus_
  * Sumber: index.html L18208-18491
@@ -38,7 +38,7 @@ function renderAdminHome(container) {
     color: 'emerald',
     icon: 'fa-right-to-bracket',
     title: 'Sesi Aktif',
-    desc: `Anda masuk sebagai <b>${currentUser.role}</b>${currentUser.username ? ' — ' + currentUser.username : ''}.`,
+    desc: `Anda masuk sebagai <b>${(currentUser && currentUser.role) || 'Admin'}</b>${(currentUser && currentUser.username) ? ' — ' + currentUser.username : ''}.`,
     when: loginAgoStr
   });
   if (activeExams > 0) {
@@ -276,11 +276,15 @@ function _dashRelTime(ts) {
 }
 
 // ── FIX: helper liveStatus yang dibagi antara renderExamForm, handleDeleteAllExams,
-//         dan fungsi lain agar kalkulasi status selalu konsisten ──
+//         dan fungsi lain agar kalkulasi status selalu konsisten.
+//         Mendukung KEDUA format field: e.startDate (format baru) dan e.date (format lama).
 function _examLiveStatus_(e, now) {
   const _now = now != null ? now : Date.now();
-  const start = e.date    ? new Date(e.date).getTime()    : null;
-  const end   = e.endDate ? new Date(e.endDate).getTime() : null;
+  // Dukung e.startDate (format baru) dan e.date (format lama) secara konsisten
+  const startRaw = e.startDate || e.date;
+  const endRaw   = e.endDate;
+  const start = startRaw ? new Date(startRaw).getTime() : null;
+  const end   = endRaw   ? new Date(endRaw).getTime()   : null;
   const saved = String(e.status || '').toLowerCase();
   if (saved === 'aktif' && start && end && _now >= start && _now <= end) return 'live';
   if (start && _now < start) return 'upcoming';
