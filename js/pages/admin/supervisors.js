@@ -1,4 +1,4 @@
-﻿/**
+/**
  * supervisors.js — Manajemen Pengawas
  * Sumber: index.html L45329-48674
  */
@@ -509,9 +509,9 @@ function renderSupervisorHome(container) {
 
           <!-- ══ HEADER BANNER ══ -->
           <div class="svd-header-banner">
-            <div class="svd-header-avatar">${(currentUser.username || 'P').charAt(0).toUpperCase()}</div>
+            <div class="svd-header-avatar">${escHtmlGlobal((currentUser.username || 'P').charAt(0).toUpperCase())}</div>
             <div class="svd-header-text">
-              <div class="svd-header-greeting">Selamat Datang, ${currentUser.username}!</div>
+              <div class="svd-header-greeting">Selamat Datang, ${escHtmlGlobal(currentUser.username || '')}!</div>
               <div class="svd-header-date">
                 <i class="fas fa-shield-halved" style="margin-right:5px;opacity:.75;"></i>Pengawas Ujian
                 <span class="svd-header-date-sep">·</span>
