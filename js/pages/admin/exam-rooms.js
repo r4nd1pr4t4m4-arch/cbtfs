@@ -1,4 +1,4 @@
-﻿/**
+/**
  * exam-rooms.js — Ruang Ujian
  * renderExamRoomPage() + _er* helpers
  * Sumber: index.html L48675-50837
@@ -2167,3 +2167,12 @@ function _svMgmtSyncIfActive() {
 
 // ── Update cache assignments Manajemen Pengawas secara in-place ──────────────
 function _svMgmtUpdateRoomNameCache(examID, oldRoomName, newRoomName) {
+
+  if (!examID || !oldRoomName || !newRoomName) return;
+  if (oldRoomName === newRoomName) return;
+  const key = String(examID);
+  if (!window._svMgmtAssignCache || !window._svMgmtAssignCache[key]) return;
+  window._svMgmtAssignCache[key].forEach(function(a) {
+    if (a.roomName === oldRoomName) a.roomName = newRoomName;
+  });
+}
