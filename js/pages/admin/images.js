@@ -1,14 +1,8 @@
-﻿/**
+/**
  * images.js — Folder Gambar
  * renderImageFolder() + upload + image picker + _if* helpers
  * Sumber: index.html L34539-36009
  */
-
-    document.removeEventListener('keydown', modal._escHandler);
-    modal._escHandler = null;
-  }
-  modal.remove();
-}
 
 // ============================================================================
 // Task 12.1 — Persist the audio reference on the Bank_Soal question editor
@@ -373,7 +367,9 @@ function handleImgFileDrop(e) {
     e.preventDefault();
     const area = document.getElementById('img-upload-drop-area');
     if (area) area.classList.remove('dragover');
-    _addFilesToQueue(Array.from(e.dataTransfer.files));
+    // Null-guard: e.dataTransfer bisa null di beberapa browser pada event tertentu
+    const files = (e.dataTransfer && e.dataTransfer.files) ? e.dataTransfer.files : [];
+    _addFilesToQueue(Array.from(files));
 }
 
 function _addFilesToQueue(files) {
@@ -501,8 +497,11 @@ function _uploadNext() {
       }
     };
     reader.onload = function(e) {
-        _imgUploadQueue[idx].progress = 75;
-        _renderUploadQueue();
+        // Null-guard: queue bisa di-clear saat reader.onload dipanggil async
+        if (_imgUploadQueue[idx]) {
+          _imgUploadQueue[idx].progress = 75;
+          _renderUploadQueue();
+        }
         const base64Full = e.target.result;
         const commaIdx   = String(base64Full).indexOf(',');
         const base64Data = commaIdx >= 0 ? base64Full.substring(commaIdx + 1) : base64Full;
@@ -1475,3 +1474,126 @@ function _ckToggleShift(isArab) {
   } else {
     if (_ckState.shiftOn && !_ckState.capsOn) {
       // shift → caps
+
+      _ckState.capsOn  = true;
+      _ckState.shiftOn = true;
+    } else if (_ckState.capsOn) {
+      // caps → off
+      _ckState.capsOn  = false;
+      _ckState.shiftOn = false;
+    } else {
+      // off → shift
+      _ckState.shiftOn = true;
+      _ckState.capsOn  = false;
+    }
+  }
+  _ckRefreshKeyboard();
+}
+
+// ── Auto-off shift setelah satu ketukan ─────────────────────────────
+
+function _ckAutoOffShift() {
+  if (_ckState.shiftOn && !_ckState.capsOn) {
+    _ckState.shiftOn = false;
+    _ckRefreshKeyboard();
+  }
+}
+
+// ── Switch tab (abc / num / sym / arab / math) ───────────────────────
+
+function _ckSwitchTab(tab) {
+  _ckState.currentTab = tab;
+  _ckRefreshKeyboard();
+}
+
+// ── Refresh / rebuild keyboard content ──────────────────────────────
+
+function _ckRefreshKeyboard() {
+  const qId = _ckState.activeQId;
+  if (!qId) return;
+  const wrap = document.getElementById(`ck-keyboard-${qId}`);
+  if (!wrap) return;
+  _ckBuildKeyboard(wrap, qId);
+}
+
+// ── Build full keyboard into container ──────────────────────────────
+
+function _ckBuildKeyboard(wrap, qId) {
+  wrap.innerHTML = '';
+
+  const tab       = _ckState.currentTab;
+  const shiftOn   = _ckState.shiftOn;
+  const capsOn    = _ckState.capsOn;
+  const arabShift = _ckState.arabShiftOn;
+
+  let layout;
+  let isArab = false;
+
+  if (tab === 'arab') {
+    layout = arabShift ? { rows: _CK_ARAB.shiftRows, bottom: _CK_ARAB.bottom }
+                       : { rows: _CK_ARAB.rows,      bottom: _CK_ARAB.bottom };
+    isArab = true;
+  } else if (tab === 'num') {
+    layout = _CK_NUM;
+  } else if (tab === 'sym') {
+    layout = _CK_SYM;
+  } else {
+    layout = _CK_LATIN;
+  }
+
+  // Tab bar
+  const tabBar = document.createElement('div');
+  tabBar.className = 'ck-tab-bar';
+  const tabs = [
+    { id: 'abc',  label: 'ABC' },
+    { id: 'num',  label: '123' },
+    { id: 'sym',  label: '#!@' },
+    { id: 'arab', label: 'عر' },
+    { id: 'math', label: 'Math' },
+  ];
+  tabs.forEach(t => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = t.label;
+    btn.className = `ck-tab-btn${tab === t.id ? ' active' : ''}`;
+    btn.addEventListener('mousedown', e => e.preventDefault());
+    btn.addEventListener('click', () => _ckSwitchTab(t.id));
+    tabBar.appendChild(btn);
+  });
+  wrap.appendChild(tabBar);
+
+  // Math sub-tab (jika tab math)
+  if (tab === 'math') {
+    _ckBuildMathKeyboard(wrap);
+    return;
+  }
+
+  // Key rows
+  layout.rows.forEach(rowKeys => {
+    wrap.appendChild(_ckBuildRow(rowKeys, shiftOn, arabShift, isArab));
+  });
+
+  // Bottom row (space, enter, dll)
+  if (layout.bottom) {
+    const bottomRow = document.createElement('div');
+    bottomRow.className = 'ck-row ck-bottom-row';
+    layout.bottom.forEach(k => {
+      let btn;
+      const ku = k.toUpperCase();
+      if (ku === 'SPACE') {
+        btn = _ckMakeKey('Spasi', 'space-key', () => _ckInsert(' '));
+        btn.style.flex = '1';
+      } else if (ku === 'ENTER') {
+        btn = _ckMakeKey('<i class="fas fa-turn-down fa-flip-horizontal"></i>', 'special', _ckEnter, 'Enter');
+        btn.style.minWidth = '44px';
+      } else {
+        btn = _ckBuildRow([k], shiftOn, arabShift, isArab).querySelector('.ck-key');
+        if (!btn) {
+          btn = _ckMakeKey(k, 'special sym-key', () => _ckSwitchTab(k.toLowerCase()));
+        }
+      }
+      bottomRow.appendChild(btn);
+    });
+    wrap.appendChild(bottomRow);
+  }
+}
