@@ -763,7 +763,7 @@ function _ifBuildTableRow(img, idx) {
       <td style="text-align:center;color:#94a3b8;font-weight:600;">${idx}</td>
       <td>
         <div class="if-thumb" onclick="_imgOpenLightbox('${escAttr(img.link)}', '${escAttr(img.name)}')">
-          <img src="${escAttr(img.link)}" referrerpolicy="no-referrer" alt="${escAttr(img.name)}" onerror="this.src='https://via.placeholder.com/64?text=Err'">
+          <img src="${escAttr(img.link)}" referrerpolicy="no-referrer" alt="${escAttr(img.name)}" onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 fill=%22%23f1f5f9%22/%3E%3Ctext x=%2232%22 y=%2240%22 text-anchor=%22middle%22 font-size=%2222%22 fill=%22%2394a3b8%22%3E%26%23128444%3B%3C/text%3E%3C/svg%3E'">
         </div>
       </td>
       <td>
@@ -800,7 +800,7 @@ function _ifBuildCards(items) {
     return `
       <div class="if-card-img">
         <div class="if-card-img-thumb" onclick="_imgOpenLightbox('${escAttr(img.link)}', '${escAttr(img.name)}')">
-          <img src="${escAttr(img.link)}" referrerpolicy="no-referrer" alt="${escAttr(img.name)}" onerror="this.src='https://via.placeholder.com/200?text=Err'">
+          <img src="${escAttr(img.link)}" referrerpolicy="no-referrer" alt="${escAttr(img.name)}" onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 200%22%3E%3Crect width=%22200%22 height=%22200%22 fill=%22%23f1f5f9%22/%3E%3Ctext x=%22100%22 y=%22115%22 text-anchor=%22middle%22 font-size=%2264%22 fill=%22%2394a3b8%22%3E%26%23128444%3B%3C/text%3E%3C/svg%3E'">
         </div>
         <div class="if-card-img-body">
           <div class="flex items-center gap-2 flex-wrap">
