@@ -1,28 +1,10 @@
-﻿/**
+/**
  * kartu-siswa.js — Kartu Ujian Siswa
  * renderKartuTable(), handleKartuMassal(), handleDownloadKartu(), trigger helpers
  * Sumber: index.html L39303-39322, L39714-40065
  */
 
-function handleDownloadKartu(userId) {
-    Swal.fire({
-        title: 'Sedang memproses...',
-        text: 'Menyiapkan PDF kartu ujian.',
-        allowOutsideClick: false,
-        didOpen: () => { Swal.showLoading(); }
-    });
-
-    google.script.run
-        .withSuccessHandler(res => {
-            Swal.close();
-            if (res.success) {
-                window.open(res.url, '_blank');
-            } else {
-                Swal.fire('Gagal', res.message, 'error');
-            }
-        })
-        .downloadKartuSiswa(userId); 
-}
+// handleDownloadKartu didefinisikan di users.js (dengan _validateKartuConfig + _doDownloadKartu)
 
 
 function renderKartuTable() {
