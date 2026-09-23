@@ -8,8 +8,13 @@
   <meta name="app-version" content="5.1.0">
   <meta name="app-env" content="vercel">
   <title>SIPADU CBT | Ujian Online</title>
+  <!-- Favicon inline SVG — tidak perlu file eksternal, tidak akan 404 -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%234f46e5'/%3E%3Ctext x='16' y='23' text-anchor='middle' font-size='18' font-family='sans-serif' fill='white'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E">
 
   <!-- ── External Libraries ── -->
+  <!-- Tailwind CSS Play CDN — satu-satunya cara pakai Tailwind via CDN tanpa build step.
+       Warning "should not be used in production" adalah advisory, bukan error fungsional.
+       Untuk production sejati gunakan: npx tailwindcss -o css/tailwind.min.css --minify -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
