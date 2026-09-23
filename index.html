@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="utf-8">
@@ -52,12 +52,12 @@
   <link rel="stylesheet" href="/css/pages/essay-grading.css">
   <link rel="stylesheet" href="/css/pages/item-analysis.css">
 
-  <!-- VERCEL: GAS URL injected at build time -->
-  <div id="__GAS_CONFIG__" data-gas-url="https://script.google.com/macros/s/AKfycbwHNjzGCBgrM3umOSYJzY1WO079ucscGUUbVUWphai44wOnIhTbu1hgXrh_7ummaVyb/exec" style="display:none"></div>
   <!-- VERCEL: API client adapter — replaces google.script.run with fetch() -->
   <script src="/api-client.js"></script>
 </head>
 <body class="overflow-x-hidden text-slate-800">
+  <!-- VERCEL: GAS URL injected at build time. Harus di <body> — div tidak valid di dalam <head>. -->
+  <div id="__GAS_CONFIG__" data-gas-url="https://script.google.com/macros/s/AKfycbwHNjzGCBgrM3umOSYJzY1WO079ucscGUUbVUWphai44wOnIhTbu1hgXrh_7ummaVyb/exec" style="display:none"></div>
 
   <!-- Portrait Lock Overlay: ditampilkan saat siswa memutar ke portrait selama ujian.
        Memberikan toleransi 20 detik sebelum dianggap pelanggaran. -->
