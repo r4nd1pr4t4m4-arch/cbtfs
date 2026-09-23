@@ -1,9 +1,11 @@
-﻿/**
+/**
  * exam.js — Halaman Ujian Siswa
  * initStudentExam(), renderQuestion(), semua handler ujian siswa
  * Sumber: index.html L25831-28863
  */
 
+/**
+ * Mengembalikan true jika perangkat ini dianggap mobile/tablet,
  * berdasarkan lebar layar fisik (≤ 1024px) dan user-agent touch hints.
  */
 function _isMobileDevice() {
