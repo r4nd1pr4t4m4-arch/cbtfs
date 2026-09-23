@@ -1,4 +1,4 @@
-﻿/**
+/**
  * config.js — Konfigurasi Sistem
  * renderConfigPage() + loadConfigToForm() + handleSaveConfig() + semua config helpers
  * Sumber: index.html L37022-38181
@@ -199,19 +199,8 @@ function updateKopPreview() {
     applyFmt('cfg-kop-prev-kontak', kontak, 'kontak');
 }
 
-function toggleCfgAccordion(id) {
-    switchCfgTab(id);
-}
-
-
-function openCfgSection(id) {
-    switchCfgTab(id);
-    setTimeout(() => {
-        const panel = document.getElementById('tab-panel-' + id);
-        if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 80);
-}
-
+// toggleCfgAccordion dan openCfgSection dihapus — dead wrappers yang hanya
+// meneruskan ke switchCfgTab, tidak dipanggil dari manapun dalam project.
 
 function resetCfgSection(section) {
     const sectionLabels = { tampilan:'Tampilan Aplikasi', ai:'Integrasi AI', kartu:'Kartu Ujian', kop:'KOP Surat', imgfolder:'Folder Upload Guru', audfolder:'Folder Upload Audio Guru' };
@@ -1141,8 +1130,7 @@ function _runAiConnectionTest(resultEl) {
         .testAnthropicApiKey(currentUser.userID, currentUser.token);
 }
 
-function _renderConfigExtras(container) {
-}
+// _renderConfigExtras dihapus — fungsi kosong tanpa implementasi
 
 function applyConfigToLogin(title, subtitle, logo) {
     if (title) {
