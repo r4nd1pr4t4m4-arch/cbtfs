@@ -1,4 +1,4 @@
-﻿/**
+/**
  * user-modal.js — Modal Form User (Tambah/Edit/Import)
  * createUserModalHTML(), openUserModal(), handleUserSubmit(), handleDeleteUser(), handleToggleUser()
  * Sumber: index.html L32338-33553
@@ -1198,6 +1198,9 @@ function handleToggleUser(uid, rawStatus) {
                         loadUserTable(); 
                     });
 
+                }).withFailureHandler(function(err) {
+                    document.getElementById('global-loading').classList.add('hidden');
+                    Swal.fire('Error Server', (err && err.message) || String(err), 'error');
                 }).importUsersBulk(usersToImport);
 
             } catch (err) {
@@ -1210,10 +1213,9 @@ function handleToggleUser(uid, rawStatus) {
     }
     
 let allImagesData = [];
-let allAudioData = [];
+let allAudioData  = [];
 let filteredImages = [];
-let currentImgPage = 1;
-let imgRowsPerPage = 10;
+// currentImgPage dan imgRowsPerPage dihapus — sudah dikelola oleh window._imageUI
 
 // ============================================================================
 // Audio_Folder_Page (mirror renderImageFolder)
