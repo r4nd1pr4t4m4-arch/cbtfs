@@ -1,0 +1,940 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <!-- VERCEL: Set GAS_URL here or via window.__GAS_URL__ / localStorage.__gas_url__ -->
+  <meta name="gas-url" content="https://script.google.com/macros/s/AKfycbwHNjzGCBgrM3umOSYJzY1WO079ucscGUUbVUWphai44wOnIhTbu1hgXrh_7ummaVyb/exec">
+  <meta name="app-version" content="5.1.0">
+  <meta name="app-env" content="vercel">
+  <title>SIPADU CBT | Ujian Online</title>
+
+  <!-- ── External Libraries ── -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700&family=Scheherazade+New:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.2/tinymce.min.js"></script>
+
+  <!-- MathJax config (harus sebelum MathJax script) -->
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script"></script>
+
+  <!-- ── Application CSS (modular) ── -->
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/components/sidebar.css">
+  <link rel="stylesheet" href="/css/components/navbar.css">
+  <link rel="stylesheet" href="/css/components/modal-notif.css">
+  <link rel="stylesheet" href="/css/components/batch-soal-ui.css">
+  <link rel="stylesheet" href="/css/components/custom-keyboard.css">
+  <link rel="stylesheet" href="/css/pages/login.css">
+  <link rel="stylesheet" href="/css/pages/exam-schedule.css">
+  <link rel="stylesheet" href="/css/pages/bank-soal.css">
+  <link rel="stylesheet" href="/css/pages/question-bank.css">
+  <link rel="stylesheet" href="/css/pages/progress-soal.css">
+  <link rel="stylesheet" href="/css/pages/results.css">
+  <link rel="stylesheet" href="/css/pages/users.css">
+  <link rel="stylesheet" href="/css/pages/images.css">
+  <link rel="stylesheet" href="/css/pages/config.css">
+  <link rel="stylesheet" href="/css/pages/master-data.css">
+  <link rel="stylesheet" href="/css/pages/admin-logs.css">
+  <link rel="stylesheet" href="/css/pages/essay-grading.css">
+  <link rel="stylesheet" href="/css/pages/item-analysis.css">
+
+  <!-- VERCEL: GAS URL injected at build time -->
+  <div id="__GAS_CONFIG__" data-gas-url="https://script.google.com/macros/s/AKfycbwHNjzGCBgrM3umOSYJzY1WO079ucscGUUbVUWphai44wOnIhTbu1hgXrh_7ummaVyb/exec" style="display:none"></div>
+  <!-- VERCEL: API client adapter — replaces google.script.run with fetch() -->
+  <script src="/api-client.js"></script>
+</head>
+<body class="overflow-x-hidden text-slate-800">
+
+  <!-- Portrait Lock Overlay: ditampilkan saat siswa memutar ke portrait selama ujian.
+       Memberikan toleransi 20 detik sebelum dianggap pelanggaran. -->
+  <div id="portrait-lock-overlay" role="alert" aria-live="assertive">
+    <div class="plo-icon">&#x1F4F1;</div>
+    <h2>LAYAR HARUS LANDSCAPE</h2>
+    <p class="plo-desc">
+      Silakan putar HP Anda kembali ke posisi <strong style="color:#f8fafc;">Landscape</strong>
+      (horizontal) untuk melanjutkan ujian.
+    </p>
+    <div id="plo-countdown-wrap">
+      <p id="plo-countdown-label">Waktu toleransi</p>
+      <div id="plo-countdown-number">20</div>
+      <p id="plo-countdown-sublabel">detik tersisa</p>
+    </div>
+    <p id="plo-warning-text">
+      Kembali ke Landscape sebelum waktu habis.<br>
+      <strong>Jika tetap Portrait hingga waktu habis, kondisi ini akan dianggap sebagai pelanggaran.</strong>
+    </p>
+    <div id="plo-progress-bar-wrap">
+      <div id="plo-progress-bar"></div>
+    </div>
+  </div>
+
+  <div id="app" class="min-h-screen relative">
+
+    <!-- ══════════════════════════════════════════
+         PAGE: LOGIN
+    ══════════════════════════════════════════ -->
+    <div id="page-login">
+      <!-- Network status indicator -->
+      <div id="lp-net-status" class="lp-net-status" role="status" aria-live="polite">
+        <span class="lp-net-dot"></span>
+        <span id="lp-net-status-text">Online</span>
+      </div>
+
+      <!-- PANEL KIRI — Branding -->
+      <div class="lp-left">
+        <div class="lp-left-bg"></div>
+        <div class="lp-grid"></div>
+        <div class="lp-orb lp-orb-1"></div>
+        <div class="lp-orb lp-orb-2"></div>
+        <div class="lp-orb lp-orb-3"></div>
+
+        <div class="lp-content">
+          <div class="text-center mb-2">
+            <div class="lp-logo-wrap">
+              <img id="login-logo-img"
+                   src="" data-cfg="logo"
+                   style="width:52px;height:52px;object-fit:contain;"
+                   alt="Logo"
+                   onerror="this.src='https://via.placeholder.com/150?text=Logo'">
+            </div>
+            <h1 id="login-title" style="font-size:22px;font-weight:900;color:#fff;margin:0 0 4px;line-height:1.2;" data-cfg="app_name"></h1>
+            <p id="login-subtitle" style="font-size:13px;color:rgba(255,255,255,0.6);margin:0;" data-cfg="app_subtitle"></p>
+          </div>
+
+          <div class="text-center">
+            <div class="lp-clock-wrap">
+              <div class="lp-clock-time" id="login-clock">--<span class="lp-clock-sep">:</span>--<span class="lp-clock-sep">:</span>--</div>
+              <div id="login-date-display"></div>
+              <div id="login-tz-label"></div>
+            </div>
+          </div>
+
+          <div style="height:1px;background:rgba(255,255,255,0.1);margin:20px 0;"></div>
+
+          <div style="margin-bottom:6px;">
+            <p style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:.1em;margin:0 0 10px;">Fitur Unggulan</p>
+
+            <div class="lp-feature">
+              <div class="lp-feature-icon" style="background:rgba(99,102,241,0.3);color:#a5b4fc;">
+                <i class="fas fa-clipboard-list"></i>
+              </div>
+              <div>
+                <div style="font-size:12px;font-weight:700;color:#fff;">Ujian Online Multi-Tipe</div>
+                <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:1px;">PG, PG Kompleks, B/S, Menjodohkan &amp; Esai</div>
+              </div>
+            </div>
+
+            <div class="lp-feature">
+              <div class="lp-feature-icon" style="background:rgba(6,182,212,0.3);color:#67e8f9;">
+                <i class="fas fa-chart-bar"></i>
+              </div>
+              <div>
+                <div style="font-size:12px;font-weight:700;color:#fff;">Analisis Butir Soal Otomatis</div>
+                <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:1px;">Tingkat kesukaran, daya beda &amp; laporan siswa</div>
+              </div>
+            </div>
+
+            <div class="lp-feature">
+              <div class="lp-feature-icon" style="background:rgba(139,92,246,0.3);color:#c4b5fd;">
+                <i class="fas fa-shield-alt"></i>
+              </div>
+              <div>
+                <div style="font-size:12px;font-weight:700;color:#fff;">Aman &amp; Anti-Kecurangan</div>
+                <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:1px;">PIN sesi, token akses &amp; pemantauan real-time</div>
+              </div>
+            </div>
+
+            <div class="lp-feature">
+              <div class="lp-feature-icon" style="background:rgba(16,185,129,0.3);color:#6ee7b7;">
+                <i class="fas fa-print"></i>
+              </div>
+              <div>
+                <div style="font-size:12px;font-weight:700;color:#fff;">Ekspor &amp; Cetak Laporan</div>
+                <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:1px;">Excel &amp; PDF untuk semua siswa sekaligus</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:20px;text-align:center;">
+            <p style="font-size:10px;color:rgba(255,255,255,0.2);">© <span id="currentYear"></span> &nbsp;·&nbsp; Hadir untuk Kemudahan Prosesi Ujian di Madrasah/Sekolah Anda</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANEL KANAN — Form Login -->
+      <div class="lp-backdrop" id="lp-backdrop" onclick="lpCloseForm()" aria-hidden="true"></div>
+      <div class="lp-right" id="lp-right" role="dialog" aria-modal="true" aria-label="Form Login" aria-hidden="true">
+        <div class="lp-mobile-sheet" id="lp-mobile-sheet">
+          <div class="lp-drag-handle" id="lp-drag-handle" aria-hidden="true"></div>
+          <div class="lp-form-card fade-in">
+
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+              <div>
+                <h2 style="font-size:18px;font-weight:900;color:#1e293b;margin:0 0 2px;">Masuk ke Akun Anda</h2>
+                <p id="lp-form-hint" style="font-size:12px;color:#94a3b8;margin:0;">Pilih peran lalu masukkan kredensial Anda</p>
+              </div>
+              <button type="button" class="lp-sheet-close" onclick="lpCloseForm()" title="Tutup" aria-label="Tutup form login">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+
+            <div class="lp-role-wrap" id="lp-role-wrap" role="tablist" aria-label="Pilih peran">
+              <div class="lp-role-slider" id="lp-role-slider"></div>
+              <div class="lp-role-btn active" id="lp-role-siswa" onclick="lpSetRole('siswa')" role="tab" tabindex="0" aria-selected="true">
+                <i class="fas fa-user-graduate" style="margin-right:4px;"></i>Siswa
+              </div>
+              <div class="lp-role-btn" id="lp-role-admin" onclick="lpSetRole('admin')" role="tab" tabindex="-1" aria-selected="false">
+                <i class="fas fa-user-shield" style="margin-right:4px;"></i>Admin / Guru
+              </div>
+              <div class="lp-role-btn" id="lp-role-pengawas" onclick="lpSetRole('pengawas')" role="tab" tabindex="-1" aria-selected="false">
+                <i class="fas fa-user-tie" style="margin-right:4px;"></i>Pengawas
+              </div>
+            </div>
+
+            <form id="loginForm" onsubmit="handleLogin(event)" novalidate>
+
+              <div class="lp-input-wrap">
+                <label class="lp-label" for="username">Username</label>
+                <div class="lp-input-inner">
+                  <i class="fas fa-id-card lp-input-icon"></i>
+                  <input type="text" id="username" name="username"
+                    class="lp-input" placeholder="Contoh: SIS-001" required
+                    autocomplete="username" autocapitalize="off" spellcheck="false">
+                </div>
+              </div>
+
+              <div class="lp-input-wrap">
+                <label class="lp-label" for="password">Password</label>
+                <div class="lp-input-inner">
+                  <i class="fas fa-lock lp-input-icon"></i>
+                  <input type="password" id="password" name="password"
+                    class="lp-input" style="padding-right:40px;"
+                    placeholder="••••••••" required autocomplete="current-password">
+                  <span class="lp-input-eye" onclick="togglePasswordVisibility()" title="Tampilkan/Sembunyikan password" role="button" tabindex="0" aria-label="Tampilkan atau sembunyikan password">
+                    <i class="fas fa-eye" id="icon-toggle-pass"></i>
+                  </span>
+                </div>
+                <div id="caps-warning" class="lp-caps-warn" aria-live="polite">
+                  <i class="fas fa-arrow-up"></i>
+                  <span>Caps Lock sedang aktif</span>
+                </div>
+              </div>
+
+              <div id="pin-container" class="lp-input-wrap">
+                <label class="lp-label" for="pin" style="color:#ea580c;">
+                  <i class="fas fa-key" style="margin-right:4px;"></i>PIN Sesi Ujian
+                  <span style="background:#fff7ed;border:1px solid #fed7aa;border-radius:20px;padding:1px 7px;font-size:9px;font-weight:700;color:#ea580c;margin-left:6px;text-transform:none;letter-spacing:0;">Wajib untuk siswa</span>
+                </label>
+                <div class="lp-input-inner">
+                  <input type="text" id="pin" name="pin"
+                    class="lp-input pin-style"
+                    placeholder="••••••" required
+                    maxlength="10" inputmode="numeric"
+                    autocomplete="off" autocapitalize="off" spellcheck="false"
+                    pattern="[0-9]*">
+                </div>
+                <p class="lp-pin-hint">
+                  <i class="fas fa-info-circle"></i>
+                  <span>PIN diberikan oleh Pengawas Ujian. Hanya angka.</span>
+                </p>
+              </div>
+
+              <div class="lp-helper-row">
+                <label class="lp-remember" for="lp-remember-me">
+                  <input type="checkbox" id="lp-remember-me">
+                  <span>Ingat username</span>
+                </label>
+                <a href="#" class="lp-help-link" onclick="lpShowHelp(event)">
+                  <i class="fas fa-circle-question"></i>
+                  Butuh bantuan?
+                </a>
+              </div>
+
+              <button type="submit" id="btnLogin" class="lp-btn-submit" style="margin-top:6px;">
+                <i class="fas fa-arrow-right-to-bracket"></i>
+                <span>Masuk Aplikasi</span>
+              </button>
+
+              <div id="loginError" class="lp-error" style="display:none;" role="alert" aria-live="assertive">
+                <i class="fas fa-circle-exclamation" style="flex-shrink:0;font-size:14px;margin-top:1px;"></i>
+                <span id="errorText">Error message here</span>
+              </div>
+
+            </form>
+
+            <div style="margin-top:24px;text-align:center;border-top:1px solid #e2e8f0;padding-top:16px;">
+              <p style="font-size:11px;color:#94a3b8;margin:0;">
+                <i class="fas fa-lock" style="margin-right:4px;color:#cbd5e1;"></i>
+                Koneksi aman dan private terenkripsi
+              </p>
+            </div>
+
+          </div><!-- /lp-form-card -->
+        </div><!-- /lp-mobile-sheet -->
+      </div><!-- /lp-right -->
+
+      <!-- TOMBOL CTA MOBILE -->
+      <div class="lp-mobile-cta" id="lp-mobile-cta">
+        <button class="lp-mobile-cta-btn" onclick="lpOpenForm()" aria-label="Buka form login">
+          <i class="fas fa-sign-in-alt"></i>
+          <span>Masuk ke Aplikasi</span>
+          <i class="fas fa-chevron-up" style="margin-left:4px;font-size:12px;opacity:.7;"></i>
+        </button>
+        <span class="lp-mobile-cta-hint">Geser ke atas atau ketuk tombol untuk login</span>
+      </div>
+
+    </div><!-- /page-login -->
+
+    <!-- ══════════════════════════════════════════
+         PAGE: ADMIN
+    ══════════════════════════════════════════ -->
+    <div id="page-admin" class="hidden flex h-screen bg-slate-100 overflow-hidden">
+
+      <aside id="admin-sidebar" class="sidebar-bg w-72 h-full flex flex-col fixed md:relative z-40 transition-all duration-300 shadow-2xl transform -translate-x-full md:translate-x-0">
+
+        <!-- HEADER: Logo + App Name -->
+        <div class="h-[68px] flex items-center justify-between px-4 border-b border-white/[0.05] shrink-0">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="sidebar-logo-icon w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 via-indigo-500 to-blue-600 flex items-center justify-center shadow-lg shrink-0">
+              <i class="fas fa-graduation-cap text-white text-sm"></i>
+            </div>
+            <div class="sidebar-header-text min-w-0">
+              <div class="flex items-center gap-2">
+                <h1 class="text-white font-bold text-[14px] tracking-tight truncate leading-tight" data-cfg="app_name"></h1>
+                <span class="sidebar-version-tag">v5.1</span>
+              </div>
+              <p class="text-slate-600 text-[10px] font-semibold tracking-widest uppercase mt-0.5">Admin Panel</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- USER CARD -->
+        <div class="px-3 py-3 border-b border-white/[0.04] shrink-0">
+          <div class="sidebar-user-card flex items-center gap-3 px-3 py-2.5 rounded-xl">
+            <div id="sidebar-avatar" class="user-info-avatar w-9 h-9 rounded-lg bg-gradient-to-br from-violet-400 via-indigo-500 to-blue-500 flex items-center justify-center text-white font-bold text-sm shadow-md shrink-0 ring-2 ring-white/10">A</div>
+            <div class="user-info-text min-w-0 flex-1">
+              <p class="text-slate-200 text-[13px] font-semibold truncate leading-tight" id="admin-sidebar-name">Administrator</p>
+              <div class="flex items-center gap-1.5 mt-0.5">
+                <span class="relative flex h-1.5 w-1.5">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                </span>
+                <span id="sidebar-role-badge" class="text-[10px] text-slate-500 font-semibold tracking-wide">Admin</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- NAV -->
+        <nav class="flex-1 overflow-y-auto py-3 px-2.5 space-y-0.5 scrollbar-hide">
+
+          <p class="sidebar-section-label">Menu Utama</p>
+
+          <div class="sidebar-item" data-tab="dash-home" data-tooltip="Dashboard" onclick="showAdminTab('dash-home', this)">
+            <i class="fas fa-house-chimney"></i>
+            <span class="sidebar-text">Dashboard</span>
+          </div>
+          <div class="sidebar-item" data-tab="dash-exams" data-tooltip="Jadwal Ujian" onclick="showAdminTab('dash-exams', this)">
+            <i class="fas fa-calendar-check"></i>
+            <span class="sidebar-text">Jadwal Ujian</span>
+          </div>
+          <div class="sidebar-item" data-tab="dash-questions" data-tooltip="Bank Soal" onclick="showAdminTab('dash-questions', this)">
+            <i class="fas fa-layer-group"></i>
+            <span class="sidebar-text">Bank Soal</span>
+          </div>
+          <div id="menu-progress-soal" class="sidebar-item" data-tab="dash-progress-soal" data-tooltip="Progress Soal" onclick="showAdminTab('dash-progress-soal', this)">
+            <i class="fas fa-chart-pie"></i>
+            <span class="sidebar-text">Progress Soal</span>
+          </div>
+          <div id="menu-essay-grading" class="sidebar-item" data-tab="dash-essay-grading" data-tooltip="Progres Koreksi Esai" onclick="showAdminTab('dash-essay-grading', this)">
+            <i class="fas fa-pen-to-square"></i>
+            <span class="sidebar-text">Progres Koreksi Esai</span>
+          </div>
+          <div class="sidebar-item" data-tab="dash-results" data-tooltip="Hasil &amp; Nilai" onclick="showAdminTab('dash-results', this)">
+            <i class="fas fa-chart-column"></i>
+            <span class="sidebar-text">Hasil &amp; Nilai</span>
+          </div>
+
+          <div class="sidebar-divider"></div>
+          <p class="sidebar-section-label">Pengguna</p>
+
+          <div id="menu-users" class="sidebar-item" data-tab="dash-users" data-tooltip="Manajemen User" onclick="showAdminTab('dash-users', this)">
+            <i class="fas fa-users"></i>
+            <span class="sidebar-text">Manajemen User</span>
+          </div>
+          <div id="menu-kartu-siswa" class="sidebar-item" data-tab="dash-kartu-siswa" data-tooltip="Kartu Ujian Siswa" onclick="showAdminTab('dash-kartu-siswa', this)">
+            <i class="fas fa-id-card"></i>
+            <span class="sidebar-text">Kartu Ujian Siswa</span>
+          </div>
+          <div id="menu-supervisors" class="sidebar-item" data-tab="dash-supervisors" data-tooltip="Manajemen Pengawas" onclick="showAdminTab('dash-supervisors', this)">
+            <i class="fas fa-user-shield"></i>
+            <span class="sidebar-text">Manajemen Pengawas</span>
+          </div>
+          <div id="menu-exam-rooms" class="sidebar-item" data-tab="dash-exam-rooms" data-tooltip="Ruang Ujian" onclick="showAdminTab('dash-exam-rooms', this)">
+            <i class="fas fa-door-open"></i>
+            <span class="sidebar-text">Ruang Ujian</span>
+          </div>
+
+          <div class="sidebar-divider"></div>
+          <p class="sidebar-section-label">Sistem</p>
+
+          <div id="menu-images" class="sidebar-item" data-tab="dash-images" data-tooltip="Folder Gambar" onclick="showAdminTab('dash-images', this)">
+            <i class="fas fa-images"></i>
+            <span class="sidebar-text">Folder Gambar</span>
+          </div>
+          <div id="menu-audio" class="sidebar-item" data-tab="dash-audio" data-tooltip="Folder Audio" onclick="showAdminTab('dash-audio', this)">
+            <i class="fas fa-music"></i>
+            <span class="sidebar-text">Folder Audio</span>
+          </div>
+          <div id="menu-config" class="sidebar-item" data-tab="dash-config" data-tooltip="Konfigurasi" onclick="showAdminTab('dash-config', this)">
+            <i class="fas fa-sliders"></i>
+            <span class="sidebar-text">Konfigurasi</span>
+          </div>
+          <div id="menu-master-data" class="sidebar-item" data-tab="dash-master-data" data-tooltip="Data Master" onclick="showAdminTab('dash-master-data', this)">
+            <i class="fas fa-database"></i>
+            <span class="sidebar-text">Data Master</span>
+          </div>
+          <div class="sidebar-item" data-tab="dash-item-analysis" data-tooltip="Analisis Butir Soal" onclick="showAdminTab('dash-item-analysis', this)">
+            <i class="fas fa-flask"></i>
+            <span class="sidebar-text">Analisis Butir Soal</span>
+          </div>
+          <div id="menu-admin-logs" class="sidebar-item" data-tab="dash-admin-logs" data-tooltip="Log Aktivitas" onclick="showAdminTab('dash-admin-logs', this)">
+            <i class="fas fa-scroll"></i>
+            <span id="menu-admin-logs-text" class="sidebar-text">Log Aktivitas Admin</span>
+          </div>
+
+        </nav>
+
+        <!-- LOGOUT -->
+        <div class="px-2.5 py-3 border-t border-white/[0.04] shrink-0">
+          <button onclick="logout()" class="sidebar-logout-btn">
+            <i class="fas fa-arrow-right-from-bracket"></i>
+            <span class="sidebar-text">Keluar</span>
+          </button>
+        </div>
+      </aside>
+
+      <div class="flex-1 flex flex-col min-w-0 overflow-hidden relative">
+
+        <header class="admin-navbar h-[64px] flex items-center justify-between px-4 sm:px-6 z-30 sticky top-0 shrink-0">
+          <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+            <button class="md:hidden navbar-icon-btn" onclick="toggleMobileSidebar()" aria-label="Buka menu">
+              <i class="fas fa-bars text-sm"></i>
+            </button>
+            <button class="hidden md:flex navbar-collapse-btn" onclick="toggleDesktopSidebar()" aria-label="Lipat sidebar" title="Lipat / buka sidebar">
+              <i class="fas fa-indent text-xs" id="collapse-icon"></i>
+            </button>
+            <h2 class="navbar-page-title" id="admin-header-title">Dashboard Overview</h2>
+          </div>
+
+          <div class="flex items-center gap-2 sm:gap-3">
+            <button id="dash-cmdk-trigger" onclick="openDashCmdK()" class="navbar-search-pill hidden md:inline-flex" title="Pencarian Cepat (Ctrl+K)">
+              <span class="nmsp-icon"><i class="fas fa-search"></i></span>
+              <span>Cari menu</span>
+              <span class="dash-cmdk-kbd text-[10px] ml-1">Ctrl K</span>
+            </button>
+
+            <div class="navbar-datetime hidden sm:block cursor-default select-none">
+              <div class="text-[10px] text-slate-400 font-semibold tracking-wide text-right" id="current-date-display">Senin, 1 Jan 2024</div>
+              <div class="flex items-center gap-1.5 justify-end mt-0.5">
+                <span class="text-[13px] font-bold text-slate-700 font-mono tracking-wider" id="current-time-display">--:--:--</span>
+                <span id="current-tz-label" class="text-[9px] font-bold text-indigo-500 bg-indigo-50 border border-indigo-100 px-1.5 py-0.5 rounded-md">WIB</span>
+              </div>
+            </div>
+
+            <div class="h-7 w-px bg-slate-200 hidden sm:block"></div>
+
+            <div class="dash-bell-wrap">
+              <button id="dash-bell-btn" onclick="toggleDashBell(event)" class="navbar-icon-btn" aria-label="Notifikasi" aria-expanded="false">
+                <i class="fas fa-bell text-sm"></i>
+                <span id="dash-bell-badge" class="hidden absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[9px] font-bold rounded-full border-2 border-white flex items-center justify-center shadow-sm">0</span>
+              </button>
+              <div id="dash-bell-dropdown" class="dash-bell-dropdown" role="menu" aria-label="Notifikasi">
+                <div class="dash-bell-header">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-500 text-sm">
+                      <i class="fas fa-bell"></i>
+                    </div>
+                    <div>
+                      <div class="text-[13px] font-bold text-slate-800">Notifikasi</div>
+                      <div id="dash-bell-sub" class="text-[10px] text-slate-400 font-medium">Memuat...</div>
+                    </div>
+                  </div>
+                  <button onclick="refreshDashBell()" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-blue-100 hover:text-blue-600 text-slate-500 text-xs flex items-center justify-center transition border border-slate-200 hover:border-blue-200" title="Refresh">
+                    <i class="fas fa-rotate"></i>
+                  </button>
+                </div>
+                <div id="dash-bell-list" class="dash-bell-list">
+                  <div class="dash-bell-empty"><i class="fas fa-circle-notch fa-spin mr-1.5 text-blue-400"></i> Memuat...</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <main class="flex-1 overflow-auto p-4 sm:p-5 md:p-6 lg:p-8 bg-slate-50 relative" id="admin-content">
+          <div class="flex flex-col items-center justify-center h-full text-slate-400">
+            <div class="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
+            <p>Memuat data...</p>
+          </div>
+        </main>
+      </div>
+
+      <div id="mobile-overlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-30 hidden md:hidden" onclick="toggleMobileSidebar()"></div>
+    </div><!-- /page-admin -->
+
+    <!-- Command Palette (Ctrl+K) -->
+    <div id="dash-cmdk" role="dialog" aria-modal="true" aria-label="Pencarian Cepat" onclick="if(event.target===this)closeDashCmdK()">
+      <div id="dash-cmdk-box">
+        <input id="dash-cmdk-input" type="text" placeholder="Cari menu, ujian, atau aksi..." autocomplete="off" spellcheck="false" oninput="renderDashCmdK()" onkeydown="handleDashCmdKKey(event)">
+        <div id="dash-cmdk-list"></div>
+        <div class="dash-cmdk-hint">
+          <span><span class="dash-cmdk-kbd">↑</span> <span class="dash-cmdk-kbd">↓</span> Navigasi · <span class="dash-cmdk-kbd">Enter</span> Pilih</span>
+          <span><span class="dash-cmdk-kbd">Esc</span> Tutup</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Violation Detail Slide Panel -->
+    <div id="viol-panel-overlay" role="dialog" aria-modal="true" aria-label="Riwayat Pelanggaran"
+         onclick="if(event.target===this)closeViolationPanel()">
+      <div id="viol-panel">
+        <div id="viol-panel-head">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="w-7 h-7 rounded-lg bg-orange-100 flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-exclamation-triangle text-orange-500 text-xs"></i>
+              </span>
+              <span class="font-extrabold text-slate-800 text-base" id="viol-panel-title">Riwayat Pelanggaran</span>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5 pl-9" id="viol-panel-subtitle"></p>
+          </div>
+          <button class="viol-panel-close" onclick="closeViolationPanel()" title="Tutup">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div id="viol-panel-body">
+          <div class="viol-empty"><i class="fas fa-circle-notch fa-spin mr-1"></i> Memuat...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Kirim Pesan / Notifikasi -->
+    <div id="modal-send-notif" role="dialog" aria-modal="true" aria-label="Kirim Pesan ke Siswa"
+         onclick="if(event.target===this)closeSendNotifModal()">
+      <div class="notif-modal-box">
+        <div class="notif-modal-header">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
+              <i class="fas fa-paper-plane text-white text-sm"></i>
+            </div>
+            <div>
+              <p class="font-extrabold text-white text-base leading-tight">Kirim Pesan ke Siswa</p>
+              <p class="text-xs text-blue-200 mt-0.5">Pesan akan muncul sebagai pop-up di layar ujian siswa</p>
+            </div>
+          </div>
+          <button onclick="closeSendNotifModal()" class="w-8 h-8 rounded-lg bg-white/15 hover:bg-white/30 border-none text-white cursor-pointer flex items-center justify-center transition text-sm">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="notif-modal-body">
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Target Penerima</label>
+            <div class="flex gap-2 flex-wrap" id="notif-target-group">
+              <button type="button" class="notif-target-btn active" data-target="all" onclick="setNotifTarget('all')">
+                <i class="fas fa-users mr-1"></i> Semua Siswa
+              </button>
+              <button type="button" class="notif-target-btn" data-target="exam" onclick="setNotifTarget('exam')">
+                <i class="fas fa-book-open mr-1"></i> Per Ujian
+              </button>
+              <button type="button" class="notif-target-btn" data-target="selected" onclick="setNotifTarget('selected')">
+                <i class="fas fa-user-check mr-1"></i> Siswa Terpilih
+              </button>
+            </div>
+          </div>
+          <div id="notif-exam-selector" class="hidden">
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Pilih Ujian</label>
+            <select id="notif-exam-select"
+              class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none font-medium text-slate-700 bg-white">
+              <option value="">-- Pilih Ujian Aktif --</option>
+            </select>
+          </div>
+          <div id="notif-selected-info" class="hidden">
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Siswa Dipilih</label>
+            <div id="notif-selected-list" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm text-slate-600 min-h-[40px] flex flex-wrap gap-1.5">
+              <span class="text-slate-400 italic text-xs">Belum ada siswa dipilih</span>
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Pesan Cepat</label>
+            <div class="flex flex-wrap gap-2">
+              <button type="button" class="notif-quick-btn" onclick="setNotifMessage('Mohon tenang dan fokus mengerjakan ujian.')">🤫 Mohon tenang</button>
+              <button type="button" class="notif-quick-btn" onclick="setNotifMessage('Waktu ujian tinggal 10 menit! Periksa kembali jawaban Anda.')">⏰ Waktu 10 menit</button>
+              <button type="button" class="notif-quick-btn" onclick="setNotifMessage('Periksa kembali jawaban Anda sebelum dikumpulkan.')">✅ Periksa jawaban</button>
+              <button type="button" class="notif-quick-btn" onclick="setNotifMessage('Ujian akan segera berakhir. Segera kumpulkan jawaban Anda.')">🏁 Segera kumpulkan</button>
+              <button type="button" class="notif-quick-btn" onclick="setNotifMessage('Dilarang bekerja sama. Kerjakan secara mandiri.')">🚫 Dilarang bekerja sama</button>
+            </div>
+          </div>
+          <div>
+            <label for="notif-message-input" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
+              Pesan Custom <span class="text-slate-300 font-normal normal-case">(maks. 500 karakter)</span>
+            </label>
+            <textarea id="notif-message-input" rows="3" maxlength="500"
+              placeholder="Ketik pesan yang akan dikirim ke siswa..."
+              oninput="document.getElementById('notif-char-count').textContent=this.value.length"
+              class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none text-slate-700 bg-white transition"></textarea>
+            <div class="text-right text-[10px] text-slate-400 mt-1">
+              <span id="notif-char-count">0</span>/500 karakter
+            </div>
+          </div>
+        </div>
+        <div class="notif-modal-footer">
+          <button onclick="closeSendNotifModal()"
+            class="px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-600 text-sm font-bold hover:bg-slate-50 transition">
+            Batal
+          </button>
+          <button onclick="submitSendNotif()"
+            class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow transition flex items-center gap-2 active:scale-95">
+            <i class="fas fa-paper-plane"></i> Kirim Pesan
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Container Notifikasi Siswa (halaman ujian) -->
+    <div id="student-notif-container"></div>
+
+    <!-- ══════════════════════════════════════════
+         PAGE: RESULT (Halaman Hasil Ujian Siswa)
+    ══════════════════════════════════════════ -->
+    <div id="page-result" class="hidden min-h-screen bg-slate-100 flex flex-col">
+      <header class="bg-[#2b369e] text-white px-6 py-4 flex items-center justify-between shadow-lg sticky top-0 z-30">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center border border-white/20">
+            <i class="fas fa-graduation-cap text-lg"></i>
+          </div>
+          <div>
+            <h1 class="font-bold text-lg" id="result-exam-title">Hasil Ujian</h1>
+            <p class="text-xs text-blue-200">
+              <span id="result-student-id">-</span> · <span id="result-student-name">-</span>
+            </p>
+          </div>
+        </div>
+        <button onclick="logout()" class="bg-white/10 hover:bg-white/20 border border-white/20 text-white px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2">
+          <i class="fas fa-sign-out-alt"></i> Keluar
+        </button>
+      </header>
+
+      <main class="flex-1 p-4 md:p-8 max-w-5xl mx-auto w-full">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 mb-6 text-center fade-in">
+          <p class="text-sm font-semibold text-slate-500 uppercase tracking-widest mb-2">Nilai Akhir Anda</p>
+          <div id="result-score-circle" class="inline-flex items-center justify-center w-36 h-36 rounded-full bg-emerald-500 text-white text-5xl font-bold shadow-lg shadow-emerald-200 mb-4">–</div>
+          <div id="result-score-label" class="text-slate-500 text-sm font-medium"></div>
+          <div class="mt-3 text-xs text-amber-600 font-medium" id="result-essay-note"></div>
+        </div>
+
+        <div id="result-loading" class="flex flex-col items-center justify-center py-16 text-slate-400">
+          <i class="fas fa-circle-notch fa-spin text-3xl mb-3 text-blue-500"></i>
+          <p class="font-medium">Memuat detail jawaban...</p>
+        </div>
+
+        <div id="result-detail-container" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden fade-in">
+          <div class="px-6 py-4 border-b border-slate-100 bg-slate-50 flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <h3 class="font-bold text-slate-700 flex items-center gap-2">
+              <i class="fas fa-list-alt text-blue-600"></i> Detail Jawaban Per Soal
+            </h3>
+            <div id="result-stats-row" class="flex gap-3 text-xs font-semibold flex-wrap"></div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wide border-b border-slate-200">
+                  <th class="py-3 px-4 text-center w-10">No</th>
+                  <th class="py-3 px-4">Tipe</th>
+                  <th class="py-3 px-4">Pertanyaan</th>
+                  <th class="py-3 px-4">Jawaban Anda</th>
+                  <th class="py-3 px-4">Kunci</th>
+                  <th class="py-3 px-4 text-center">Status</th>
+                  <th class="py-3 px-4 text-center">Poin</th>
+                </tr>
+              </thead>
+              <tbody id="result-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div><!-- /page-result -->
+
+    <!-- ══════════════════════════════════════════
+         PAGE: EXAM (Halaman Ujian Siswa)
+    ══════════════════════════════════════════ -->
+    <div id="page-exam" class="hidden h-screen flex flex-col bg-slate-50 font-sans">
+
+      <header class="exam-header h-16 px-4 md:px-6 py-3 flex items-center justify-between z-30 shrink-0 sticky top-0 shadow-md" style="background: var(--exam-bg); color: white;">
+        <div class="flex items-center gap-2 overflow-hidden mr-2">
+          <div class="hidden md:flex items-center justify-center w-9 h-9 rounded-xl shrink-0"
+            style="background: var(--exam-btn-bg); border: 1px solid var(--exam-btn-border);">
+            <i class="fas fa-book-open text-sm"></i>
+          </div>
+          <div class="flex flex-col min-w-0">
+            <h1 class="font-bold text-white text-sm md:text-base leading-tight truncate" id="exam-subject-title">Memuat Ujian...</h1>
+            <div class="flex items-center gap-2 text-[10px] md:text-xs font-medium mt-0.5 truncate" style="color: rgba(255,255,255,0.7);">
+              <span class="px-1.5 py-0.5 rounded text-white border text-[10px] shrink-0"
+                style="background: var(--exam-btn-bg); border-color: var(--exam-btn-border);"
+                id="student-id-display">ID</span>
+              <span class="truncate" id="student-name-display">Siswa</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="absolute left-1/2 transform -translate-x-1/2 hidden md:flex">
+          <div class="timer-capsule px-4 py-1.5 rounded-lg flex items-center gap-2"
+            style="background: rgba(0,0,0,0.25); border: 1px solid var(--exam-btn-border);">
+            <i class="fas fa-stopwatch animate-pulse" style="color: var(--exam-accent);"></i>
+            <span id="timer-display" class="font-mono font-bold text-lg" style="color: var(--exam-accent);">00:00:00</span>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 shrink-0">
+          <div class="md:hidden flex flex-col items-center justify-center px-2 py-1 rounded"
+            style="background: rgba(0,0,0,0.2); border: 1px solid var(--exam-btn-border); min-width:50px;">
+            <span class="text-[8px] uppercase tracking-wider leading-none mb-0.5" style="color: rgba(255,255,255,0.6);">Sisa</span>
+            <span id="timer-display-mobile" class="font-mono font-bold text-sm leading-none" style="color: var(--exam-accent);">00:00</span>
+          </div>
+          <button id="btn-nav-toggle-desktop" onclick="toggleExamNavDesktop()" class="exam-themed-btn hidden md:flex" title="Tampilkan/Sembunyikan Navigasi Soal">
+            <i class="fas fa-th-large text-xs"></i>
+            <span id="nav-toggle-label" class="hidden sm:inline text-xs">Navigasi</span>
+          </button>
+          <button onclick="finishExamManual()" class="exam-themed-btn primary px-3 py-2 md:px-5 md:py-2 text-xs md:text-sm">
+            <span class="hidden sm:inline">Selesai</span>
+            <i class="fas fa-check text-xs"></i>
+          </button>
+        </div>
+      </header>
+
+      <div class="flex flex-1 overflow-hidden relative">
+        <main class="flex-1 overflow-y-auto p-4 md:p-6 scroll-smooth" id="main-exam-area">
+          <div class="max-w-7xl mx-auto pb-24">
+            <div id="question-container" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 fade-in min-h-[400px] relative">
+              <div class="flex flex-col items-center justify-center h-64 text-slate-400">
+                <i class="fas fa-circle-notch fa-spin text-3xl mb-2"></i>
+                <p>Menyiapkan soal...</p>
+              </div>
+            </div>
+            <div class="flex justify-between items-center mt-6">
+              <button onclick="prevQ()" id="btn-prev" class="px-5 py-2.5 rounded-xl font-bold text-sm text-slate-500 hover:bg-white hover:text-slate-700 hover:shadow-md transition flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed border border-transparent hover:border-slate-200">
+                <i class="fas fa-arrow-left"></i> Sebelumnya
+              </button>
+              <button onclick="nextQ()" id="btn-next" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-lg shadow-blue-600/20 font-bold text-sm transition transform active:scale-95 flex items-center gap-2">
+                Selanjutnya <i class="fas fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+        </main>
+
+        <aside id="exam-nav" class="w-72 bg-white border-l border-slate-200 flex flex-col z-20 shadow-2xl absolute right-0 h-full transform translate-x-full md:relative md:translate-x-0 transition-transform duration-300">
+          <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+            <div>
+              <h3 class="font-bold text-slate-800 text-xs uppercase tracking-wide">Navigasi Soal</h3>
+              <p class="text-[10px] text-slate-400">Klik nomor untuk pindah</p>
+            </div>
+            <button class="md:hidden text-slate-400 hover:text-red-500 transition w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-50" onclick="toggleExamNav()">
+              <i class="fas fa-times text-lg"></i>
+            </button>
+          </div>
+          <div class="flex-1 overflow-y-auto p-4 custom-scrollbar">
+            <div id="nav-grid" class="grid grid-cols-5 gap-2 content-start"></div>
+            <div class="mt-6 space-y-2 border-t border-slate-100 pt-4">
+              <div class="flex items-center gap-2 text-[10px] text-slate-600">
+                <div class="w-3 h-3 rounded bg-blue-600 shadow-sm"></div> Dijawab
+              </div>
+              <div class="flex items-center gap-2 text-[10px] text-slate-600">
+                <div class="w-3 h-3 rounded border-2 border-amber-500 bg-amber-50"></div> Sedang Dikerjakan
+              </div>
+              <div class="flex items-center gap-2 text-[10px] text-slate-600">
+                <div class="w-3 h-3 rounded border border-slate-300 bg-white"></div> Belum Dijawab
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <div id="exam-nav-overlay"
+           class="md:hidden hidden fixed inset-0 bg-black/40 z-[19] backdrop-blur-[1px]"
+           onclick="toggleExamNav()"></div>
+      <button id="btn-nav-fab" class="md:hidden fixed bottom-6 right-6 text-white w-12 h-12 rounded-full shadow-xl flex items-center justify-center z-40 transform active:scale-90 transition" onclick="toggleExamNav()" style="background: var(--exam-bg);">
+        <i class="fas fa-th-large"></i>
+      </button>
+
+    </div><!-- /page-exam -->
+
+  </div><!-- /app -->
+
+  <!-- ══════════════════════════════════════════
+       STATIC MODALS (global, di luar #app)
+  ══════════════════════════════════════════ -->
+
+  <!-- Modal Koreksi Esai -->
+  <div id="modal-grading" class="fixed inset-0 z-50 hidden flex items-center justify-center p-2 sm:p-4">
+    <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="closeGradingModal()"></div>
+    <div class="relative w-full max-w-2xl">
+      <div class="bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[95vh] sm:max-h-[90vh] animate-[fadeIn_0.3s_ease-out]">
+        <div class="px-4 sm:px-6 py-3 sm:py-4 border-b flex justify-between items-center bg-blue-50 shrink-0">
+          <div class="min-w-0 flex-1">
+            <h3 class="font-bold text-base sm:text-lg text-blue-900 flex items-center gap-2"><i class="fas fa-pen-to-square"></i> Koreksi Jawaban Esai</h3>
+            <p class="text-xs text-blue-700/80 mt-0.5 truncate" id="grading-student-name">Nama Siswa</p>
+          </div>
+          <button onclick="closeGradingModal()" class="w-8 h-8 flex items-center justify-center rounded-full text-slate-400 hover:bg-red-100 hover:text-red-500 transition flex-shrink-0" aria-label="Tutup"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="p-4 sm:p-6 overflow-y-auto flex-1" id="grading-content">
+          <div class="flex justify-center py-10"><i class="fas fa-circle-notch fa-spin text-blue-500 text-2xl"></i></div>
+        </div>
+        <div class="p-3 sm:p-4 border-t bg-slate-50 shrink-0">
+          <div class="flex items-center justify-between mb-3 bg-yellow-50 p-3 rounded border border-yellow-200">
+            <span class="text-sm font-bold text-yellow-800"><i class="fas fa-calculator mr-1"></i>Total Poin Esai:</span>
+            <input type="number" id="input-essay-score" class="w-24 p-2 border border-yellow-300 rounded text-right font-bold bg-white text-yellow-700 cursor-not-allowed" placeholder="0" readonly>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="closeGradingModal()" class="flex-shrink-0 px-4 py-2.5 rounded-lg font-bold text-sm bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 transition">Batal</button>
+            <button onclick="submitEssayGrade()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-lg font-bold shadow-lg transition active:scale-95">
+              <i class="fas fa-save mr-1"></i> Simpan &amp; Hitung Ulang
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Image Viewer Modal (Ujian) -->
+  <div id="exam-img-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.88);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:center;justify-content:center;flex-direction:column;">
+    <div style="position:absolute;top:16px;right:16px;display:flex;gap:8px;z-index:10;">
+      <button onclick="examImgZoom(0.25)" title="Zoom In" style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:#fff;width:38px;height:38px;border-radius:10px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;" onmouseover="this.style.background='rgba(255,255,255,0.22)'" onmouseout="this.style.background='rgba(255,255,255,0.12)'"><i class="fas fa-search-plus"></i></button>
+      <button onclick="examImgZoom(-0.25)" title="Zoom Out" style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:#fff;width:38px;height:38px;border-radius:10px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;" onmouseover="this.style.background='rgba(255,255,255,0.22)'" onmouseout="this.style.background='rgba(255,255,255,0.12)'"><i class="fas fa-search-minus"></i></button>
+      <button onclick="examImgResetZoom()" title="Reset Zoom" style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:#fff;width:38px;height:38px;border-radius:10px;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;" onmouseover="this.style.background='rgba(255,255,255,0.22)'" onmouseout="this.style.background='rgba(255,255,255,0.12)'"><i class="fas fa-expand-arrows-alt"></i></button>
+      <button onclick="closeExamImageModal()" title="Tutup" style="background:rgba(220,38,38,0.7);border:1px solid rgba(255,100,100,0.3);color:#fff;width:38px;height:38px;border-radius:10px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;" onmouseover="this.style.background='rgba(220,38,38,0.95)'" onmouseout="this.style.background='rgba(220,38,38,0.7)'"><i class="fas fa-times"></i></button>
+    </div>
+    <div id="exam-img-zoom-badge" style="position:absolute;top:16px;left:16px;background:rgba(0,0,0,0.5);color:rgba(255,255,255,0.8);font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.15);font-family:monospace;">100%</div>
+    <div id="exam-img-scroll" style="overflow:hidden;max-width:92vw;max-height:85vh;border-radius:12px;cursor:grab;display:flex;align-items:center;justify-content:center;touch-action:none;">
+      <img id="exam-img-viewer" src="" referrerpolicy="no-referrer" draggable="false" style="display:block;border-radius:10px;box-shadow:0 8px 40px rgba(0,0,0,0.6);transform-origin:center center;transition:transform .12s ease;user-select:none;-webkit-user-drag:none;pointer-events:none;" />
+    </div>
+    <p style="margin-top:14px;color:rgba(255,255,255,0.45);font-size:11px;text-align:center;">Scroll untuk zoom &nbsp;·&nbsp; Klik area luar gambar untuk menutup</p>
+  </div>
+
+  <!-- Warning Overlay (kecurangan) -->
+  <div id="warning-overlay" class="fixed inset-0 bg-red-900/95 z-[100] flex items-center justify-center text-white p-6 text-center backdrop-blur-md hidden">
+    <div class="max-w-lg w-full border-4 border-yellow-400 p-8 rounded-2xl bg-red-800 shadow-2xl animate-pulse">
+      <i class="fas fa-hand-paper text-6xl text-yellow-400 mb-6"></i>
+      <h2 class="text-4xl font-extrabold mb-4 uppercase tracking-widest">PERINGATAN!</h2>
+      <p class="text-xl font-bold mb-2">DILARANG BERALIH TAB / MEMINIMIZE LAYAR</p>
+      <p class="text-red-200 mb-6 text-sm">Sistem mendeteksi aktivitas mencurigakan.</p>
+      <div class="bg-black/30 p-4 rounded-lg mb-6 border border-white/20">
+        <p class="text-yellow-300 font-bold uppercase text-lg">JIKA DILAKUKAN SEKALI LAGI,<br>UJIAN OTOMATIS SELESAI.</p>
+      </div>
+      <button onclick="resumeExamFromViolation()" class="w-full bg-yellow-400 text-red-900 px-8 py-4 rounded-xl font-extrabold text-xl hover:bg-yellow-300 transition shadow-lg transform hover:scale-105">
+        SAYA PAHAM &amp; KEMBALI UJIAN
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal Preview Soal -->
+  <div id="modal-preview" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="closePreviewModal()"></div>
+    <div class="relative w-full max-w-4xl p-4">
+      <div class="bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-[fadeIn_0.3s_ease-out]">
+        <div class="px-6 py-4 border-b flex justify-between items-center bg-slate-50">
+          <div>
+            <h3 class="font-bold text-lg text-slate-800 flex items-center gap-2"><i class="fas fa-eye text-teal-500"></i> Pratinjau Soal</h3>
+            <p class="text-xs text-slate-500 flex items-center gap-1.5 mt-0.5">
+              <span>Tampilan soal seperti yang dilihat siswa</span>
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200 font-bold text-[10px]">
+                <i class="fas fa-key text-[8px]"></i>+ Kunci Jawaban
+              </span>
+            </p>
+          </div>
+          <button onclick="closePreviewModal()" class="w-8 h-8 flex items-center justify-center rounded-full text-slate-400 hover:bg-red-100 hover:text-red-500 transition"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="p-4 md:p-6 overflow-y-auto bg-slate-100/70" id="preview-content-area">
+          <div id="preview-content">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex justify-center py-10"><i class="fas fa-circle-notch fa-spin text-blue-500 text-2xl"></i></div>
+          </div>
+        </div>
+        <div class="p-3 border-t bg-slate-100 text-center">
+          <button onclick="closePreviewModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-6 py-2 rounded-lg font-bold text-sm transition">Tutup</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Global Loading Spinner -->
+  <div id="global-loading" class="fixed inset-0 bg-white/80 z-[60] flex items-center justify-center hidden">
+    <div class="text-center">
+      <i class="fas fa-circle-notch fa-spin text-4xl text-blue-600 mb-3"></i>
+      <p class="text-slate-600 font-medium">Memproses...</p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       APPLICATION JAVASCRIPT (modular, ordered)
+       Urutan load PENTING — jangan diubah.
+  ══════════════════════════════════════════ -->
+
+  <!-- 1. BatchSoal modules (namespace harus pertama) -->
+  <script src="/js/batch-soal/batch-soal-namespace.js"></script>
+  <script src="/js/batch-soal/batch-soal-rules.js"></script>
+  <script src="/js/batch-soal/batch-soal-parser.js"></script>
+  <script src="/js/batch-soal/batch-soal-validator.js"></script>
+  <script src="/js/batch-soal/batch-soal-ui.js"></script>
+
+  <!-- 2. Core: config → state → utils → ui-shell → auth → app -->
+  <script src="/js/config.js"></script>
+  <script src="/js/state.js"></script>
+  <script src="/js/utils.js"></script>
+  <script src="/js/ui-shell.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/app.js"></script>
+
+  <!-- 3. Pages: login -->
+  <script src="/js/pages/login.js"></script>
+
+  <!-- 4. Admin pages (semua dibutuhkan karena showAdminTab() load on demand) -->
+  <script src="/js/pages/admin/dashboard-home.js"></script>
+  <script src="/js/pages/admin/exam-schedule.js"></script>
+  <script src="/js/pages/admin/bank-soal.js"></script>
+  <script src="/js/pages/admin/progress-soal.js"></script>
+  <script src="/js/pages/admin/results.js"></script>
+  <script src="/js/pages/admin/results-helpers.js"></script>
+  <script src="/js/pages/admin/users.js"></script>
+  <script src="/js/pages/admin/user-modal.js"></script>
+  <script src="/js/pages/admin/kartu-siswa.js"></script>
+  <script src="/js/pages/admin/supervisors.js"></script>
+  <script src="/js/pages/admin/exam-rooms.js"></script>
+  <script src="/js/pages/admin/images.js"></script>
+  <script src="/js/pages/admin/audio.js"></script>
+  <script src="/js/pages/admin/config.js"></script>
+  <script src="/js/pages/admin/exam-modal.js"></script>
+  <script src="/js/pages/admin/master-data.js"></script>
+  <script src="/js/pages/admin/essay-grading.js"></script>
+  <script src="/js/pages/admin/essay-tools.js"></script>
+  <script src="/js/pages/admin/item-analysis.js"></script>
+  <script src="/js/pages/admin/admin-logs.js"></script>
+  <script src="/js/pages/admin/rich-editor.js"></script>
+
+  <!-- 5. Student exam page -->
+  <script src="/js/pages/exam.js"></script>
+
+</body>
+</html>
