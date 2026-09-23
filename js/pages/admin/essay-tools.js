@@ -1,49 +1,26 @@
-﻿/**
+/**
  * essay-tools.js — Custom Keyboard Esai + Canvas Draw
  * _ck*, switchEssayMode, renderEssayMathTools, initEssayCanvas, canvas helpers
  * Sumber: index.html L36010-37021
  */
 
-      _ckState.capsOn  = true;
-      _ckState.shiftOn = true;
-    } else if (_ckState.capsOn) {
-      // caps → off
-      _ckState.capsOn  = false;
-      _ckState.shiftOn = false;
-    } else {
-      // off → shift (sekali)
-      _ckState.shiftOn = true;
-      _ckState.capsOn  = false;
-    }
+// ── Toggle shift / caps ──────────────────────────────────────────────
+function _ckToggleCapsShift() {
+  if (_ckState.shiftOn && !_ckState.capsOn) {
+    // shift → caps
+    _ckState.capsOn  = true;
+    _ckState.shiftOn = true;
+  } else if (_ckState.capsOn) {
+    // caps → off
+    _ckState.capsOn  = false;
+    _ckState.shiftOn = false;
+  } else {
+    // off → shift (sekali)
+    _ckState.shiftOn = true;
+    _ckState.capsOn  = false;
   }
   _ckRerenderCurrentPanel();
 }
-
-// Auto-off shift setelah satu ketukan (bukan caps)
-function _ckAutoOffShift() {
-  if (_ckState.shiftOn && !_ckState.capsOn) {
-    _ckState.shiftOn = false;
-    _ckRerenderCurrentPanel();
-  }
-}
-
-// ── Switch tab ───────────────────────────────────────────────────────
-
-function _ckSwitchTab(tabId) {
-  _ckState.currentTab = tabId;
-  const wrapper = document.getElementById(`ck-wrapper-${_ckState.activeQId}`);
-  if (!wrapper) return;
-
-  // Update tab buttons
-  wrapper.querySelectorAll('.ck-tab').forEach(t => {
-    t.classList.toggle('active', t.dataset.tab === tabId);
-  });
-  // Update panels
-  wrapper.querySelectorAll('.ck-panel').forEach(p => {
-    p.classList.toggle('active', p.dataset.panel === tabId);
-  });
-}
-
 // ── Re-render panel aktif (utk shift/caps) ───────────────────────────
 
 function _ckRerenderCurrentPanel() {
