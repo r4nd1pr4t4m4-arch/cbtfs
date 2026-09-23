@@ -1,18 +1,20 @@
-﻿/**
+/**
  * results-helpers.js — Helpers untuk Hasil & Nilai (shared antara results dan question bank)
  * Sumber: index.html L38542-38858
  */
 
 function handleResultSearch(keyword) {
-    const term = keyword.toLowerCase().trim();
+    const term = (keyword || '').toLowerCase().trim();
 
     filteredResults = allResultsData.filter(item => {
-        return item.name.toLowerCase().includes(term) ||
-            item.studentId.toLowerCase().includes(term);
+        // Null-guard: item.name / item.studentId bisa undefined dari data server
+        const name      = String(item.name      == null ? '' : item.name).toLowerCase();
+        const studentId = String(item.studentId == null ? '' : item.studentId).toLowerCase();
+        return name.includes(term) || studentId.includes(term);
     });
 
-    currentPage = 1; 
-    renderInternalTable(); 
+    currentPage = 1;
+    renderInternalTable();
 }
 
 function changeRowsPerPage(val) {
@@ -320,3 +322,24 @@ function _renderSingleQuestionForPreview(q, index) {
 }
 
 function showQuestionPreview(qStr) {
+    const modal   = document.getElementById('modal-preview');
+    const content = document.getElementById('preview-content');
+    if (!modal || !content) return;
+
+    // Decode the URL-encoded JSON string passed from onclick attributes
+    let q;
+    try {
+        q = JSON.parse(decodeURIComponent(qStr));
+    } catch (e) {
+        content.innerHTML = '<p class="text-center text-red-500 py-8">Gagal memuat data soal.</p>';
+        modal.classList.remove('hidden');
+        return;
+    }
+
+    // Render the question card and show it in the modal
+    content.innerHTML = _renderSingleQuestionForPreview(q, 1);
+    modal.classList.remove('hidden');
+
+    // Re-render math if MathJax / KaTeX is available
+    if (typeof renderMath === 'function') renderMath(content);
+}
