@@ -1,4 +1,4 @@
-﻿/**
+/**
  * exam-schedule.js — Jadwal Ujian
  * renderExamForm(), examUI*, examCopyPin, openExamModalById, duplicateExam,
  * initExamModalComponent, handleExamSubmit, examToggleSelect*, handleBulkDeleteExams,
@@ -1153,7 +1153,9 @@ function examTimeChanged() {
   // Suggest duration if it's significantly different from window
   if (sugBox && durEl) {
     const cur = parseInt(durEl.value) || 0;
-    const suggestion = Math.min(totalMinutes, Math.max(15, totalMinutes));
+    // Saran: maks 90 menit atau window penuh, minimal 15 menit.
+    // Sebelumnya: Math.min(X, Math.max(15, X)) selalu = X — tidak ada batas atas.
+    const suggestion = Math.max(15, Math.min(90, totalMinutes));
     if (cur === 0 || cur > totalMinutes) {
       sugBox.style.display = 'inline-flex';
       const span = sugBox.querySelector('span');
@@ -1584,33 +1586,6 @@ function handleDeleteExam(examId) {
         .deleteExam(examId, currentUser.userID, currentUser.token);
     }
   });
-}
-
-function toggleExamStatus(examId, currentStatus) {
-  const sheet = SS.getSheetByName('Exams');
-  const data = sheet.getDataRange().getValues();
-  let newStatus = (currentStatus === 'Aktif') ? 'Non-Aktif' : 'Aktif';
-
-  for (let i = 1; i < data.length; i++) {
-    if (String(data[i][0]) === String(examId)) {
-      const rowIdx = i + 1;
-      sheet.getRange(rowIdx, 7).setValue(newStatus);
-      if (newStatus === 'Non-Aktif') {
-        sheet.getRange(rowIdx, 4).clearContent();
-        sheet.getRange(rowIdx, 8).clearContent();
-      }
-
-      return {
-        success: true,
-        newStatus: newStatus,
-        message: newStatus === 'Non-Aktif' ? 'Status Non-Aktif. Waktu ujian telah direset.' : 'Status Aktif.'
-      };
-    }
-  }
-  return {
-    success: false,
-    message: 'Data tidak ditemukan.'
-  };
 }
 
 function switchStatus(examId, currentStatus) {
