@@ -1,4 +1,4 @@
-﻿/**
+/**
  * exam-modal.js — Modal Form Jadwal Ujian (openExamModal)
  * openExamModal(), populateClassCheckboxes(), loadMasterDataForUser(), assignment helpers
  * Sumber: index.html L38237-38573
@@ -138,86 +138,9 @@ function openExamModal(data = null) {
     }, 80);
 }
 
-function renderAssignmentDropdown(items, editData, emptyLabel) {
-    const wrapper = document.getElementById('assignment-wrapper');
-    if (!wrapper) return;
-
-    if (!items || items.length === 0) {
-        wrapper.innerHTML = `<div class="text-red-500 text-xs p-2 font-bold bg-red-50 rounded border border-red-200">Belum ada data (${emptyLabel}) di Database Users.</div>`;
-    } else {
-        let options = items.map(a => `<option value="${a.subject}|${a.classVal}">${a.label}</option>`).join('');
-
-        wrapper.outerHTML = `
-            <select id="select-assignment" onchange="fillAssignmentInput(this)" class="w-full border border-blue-300 bg-blue-50 text-blue-900 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition text-sm font-bold cursor-pointer" required>
-                <option value="">-- Pilih Mapel & Kelas --</option>
-                ${options}
-            </select>`;
-
-        if (editData) {
-            const valToSelect = `${editData.subject}|${editData.class}`;
-            const selectEl = document.getElementById('select-assignment');
-            if (selectEl) {
-                selectEl.value = valToSelect;
-                fillAssignmentInput(selectEl); 
-            }
-        }
-    }
-}
-
-function fillAssignmentInput(selectElement) {
-    const val = selectElement.value;
-    const inputSub = document.getElementById('input-subject');
-    const inputCls = document.getElementById('input-class');
-
-    if (val && val.includes('|')) {
-        const parts = val.split('|');
-        inputSub.value = parts[0]; 
-        inputCls.value = parts[1]; 
-    } else {
-        inputSub.value = '';
-        inputCls.value = '';
-    }
-}
-
-function loadMasterDataForUser(selectedClass = null) {
-
-    function afterDataLoaded() {
-        renderStudentClassDropdown(selectedClass);
-
-        const role = document.getElementById('input-role');
-        if (role && role.value === 'Guru') {
-            const container = document.getElementById('teacher-assignments-container');
-
-            if (pendingTeacherAssignments.length > 0) {
-                container.innerHTML = ''; 
-                pendingTeacherAssignments.forEach(item => {
-                    addTeacherAssignmentRow(item.sub, item.cls);
-                });
-                pendingTeacherAssignments = []; 
-            } else if (!container || container.children.length === 0) {
-
-                addTeacherAssignmentRow();
-            } else {
-                refreshAllTeacherAssignmentDropdowns();
-            }
-        }
-    }
-
-    if (!masterData || !masterData.classes || masterData.classes.length === 0) {
-        google.script.run
-            .withSuccessHandler(res => {
-                masterData = res;
-                afterDataLoaded();
-            })
-            .withFailureHandler(err => {
-                console.error('Gagal memuat Master Data:', err);
-            })
-            .getMasterData();
-    } else {
-        afterDataLoaded();
-    }
-}
-
+// renderAssignmentDropdown, fillAssignmentInput, loadMasterDataForUser dihapus:
+// fungsi-fungsi ini tidak pernah dipanggil dari exam-modal dan termasuk
+// modul user-form yang seharusnya ada di user-modal.js.
 function refreshAllTeacherAssignmentDropdowns() {
     const rows = document.querySelectorAll('#teacher-assignments-container .assignment-row');
     rows.forEach(row => {
@@ -309,34 +232,4 @@ function addTeacherAssignmentRow(subjectVal = '', classVal = '') {
     container.appendChild(div);
 }
 
-function handleResultSearch(keyword) {
-    const term = keyword.toLowerCase().trim();
 
-    filteredResults = allResultsData.filter(item => {
-        return item.name.toLowerCase().includes(term) ||
-            item.studentId.toLowerCase().includes(term);
-    });
-
-    currentPage = 1; 
-    renderInternalTable(); 
-}
-
-function changeRowsPerPage(val) {
-    if (val === 'all') {
-        rowsPerPage = filteredResults.length > 0 ? filteredResults.length : 10;
-    } else {
-        rowsPerPage = parseInt(val);
-    }
-    currentPage = 1; 
-    renderInternalTable();
-}
-
-function changePage(direction) {
-    if (direction === 'prev') {
-        if (currentPage > 1) currentPage--;
-    } else if (direction === 'next') {
-        const maxPage = Math.ceil(filteredResults.length / rowsPerPage);
-        if (currentPage < maxPage) currentPage++;
-    }
-    renderInternalTable();
-}
