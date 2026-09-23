@@ -202,18 +202,16 @@
           timezone:       'Asia/Jakarta'
         });
       }
-      return fetch(url)
-        .then(function (r) {
-          if (!r.ok) throw new Error('HTTP ' + r.status + ' saat mengambil config GAS.');
-          return r.text();
-        })
-        .then(function (text) {
-          var parsed = JSON.parse(text);
-          return (parsed && parsed.data) ? parsed.data : parsed;
+      // Gunakan POST (sama seperti semua API call lain) agar tidak terkena
+      // CORS blocking. GET ke GAS endpoint dari domain lain di-redirect ke
+      // Google login dan browser memblokir redirect cross-origin tersebut.
+      return _post('getAppConfig', [])
+        .then(function (cfg) {
+          if (!cfg || typeof cfg !== 'object') return {};
+          return cfg;
         })
         .catch(function (err) {
           console.warn('[GasAPI] getConfig gagal:', err.message || err);
-          // Kirim event dengan detail kosong agar app tidak hang
           var ev = new CustomEvent('gasConfigLoaded', { detail: {} });
           document.dispatchEvent(ev);
           return {};
@@ -341,7 +339,10 @@
       'getNotifications','sendNotification','markNotifRead',
       'getKartuConfig','manualBackup','autoActivateExams','testAnthropicApiKey','getKopConfig',
       'checkAutoActivateTriggerStatus','setupAutoActivateTrigger','removeAutoActivateTrigger',
-      'getInputPeriod','saveInputPeriod'
+      'getInputPeriod','saveInputPeriod',
+      'recheckEmailVerification',
+      'setupInputReminderTrigger','checkInputReminderTriggerStatus','removeInputReminderTrigger',
+      'setupSemesterBackupTrigger','getClientInputPeriod'
     ];
     KNOWN_FUNCTIONS.forEach(function(fn) {
       runner[fn] = (function(fnName) {
