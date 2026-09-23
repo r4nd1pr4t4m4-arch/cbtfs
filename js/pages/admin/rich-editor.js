@@ -1,4 +1,4 @@
-﻿/**
+/**
  * rich-editor.js — TinyMCE Rich Editor Init + Student Result Page
  * initRichEditor(), showStudentResultPage()
  * Sumber: index.html L39246-39714
@@ -61,25 +61,7 @@ function initRichEditor() {
     }
 }
 
-function handleDownloadKartu(userId) {
-    Swal.fire({
-        title: 'Sedang memproses...',
-        text: 'Menyiapkan PDF kartu ujian.',
-        allowOutsideClick: false,
-        didOpen: () => { Swal.showLoading(); }
-    });
-
-    google.script.run
-        .withSuccessHandler(res => {
-            Swal.close();
-            if (res.success) {
-                window.open(res.url, '_blank');
-            } else {
-                Swal.fire('Gagal', res.message, 'error');
-            }
-        })
-        .downloadKartuSiswa(userId); 
-}
+// handleDownloadKartu ada di kartu-siswa.js (dengan _validateKartuConfig)
 
 function showStudentResultPage(loginRes) {
   document.getElementById('result-exam-title').textContent = (loginRes.examData && loginRes.examData.subject) ? loginRes.examData.subject : 'Hasil Ujian';
@@ -472,4 +454,3 @@ function showStudentResultPage(loginRes) {
         })
         .getSiswaForGuru(currentUser.userID, currentUser.token);
     }
-function renderKartuTable() {
