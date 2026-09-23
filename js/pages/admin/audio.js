@@ -1,4 +1,4 @@
-﻿/**
+/**
  * audio.js — Folder Audio
  * renderAudioFolder() + audio picker + upload handlers
  * Sumber: index.html L33554-34538
@@ -926,11 +926,11 @@ function _selectAudioPickerItem(itemEl) {
   const callback = modal._audioCallback;
   const link     = itemEl.dataset.link || '';
   const audioId  = itemEl.dataset.id || '';
-  const name     = (allAudioData || []).find(a => String(a.id) === String(audioId));
-  const audObj   = name || { id: audioId, name: '', link };
-  // Always carry the freshest Direct_Link from the picker DOM in case the
-  // cached entry is stale.
-  audObj.link = link;
+  // Buat salinan dangkal agar tidak memutasi objek yang ada di cache allAudioData
+  const found    = (allAudioData || []).find(a => String(a.id) === String(audioId));
+  const audObj   = found
+    ? Object.assign({}, found, { link: link })   // salinan + link terbaru dari DOM
+    : { id: audioId, name: '', link: link };
   const uploader = itemEl.dataset.uploader || '';
 
   if (!link) { _closeAudioPickerModal(); return; }
@@ -989,3 +989,8 @@ function _closeAudioPickerModal() {
   const modal = document.getElementById('audio-picker-modal');
   if (!modal) return;
   if (modal._escHandler) {
+    document.removeEventListener('keydown', modal._escHandler);
+    modal._escHandler = null;
+  }
+  modal.remove();
+}
