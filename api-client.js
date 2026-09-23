@@ -203,10 +203,20 @@
         });
       }
       return fetch(url)
-        .then(function (r) { return r.text(); })
+        .then(function (r) {
+          if (!r.ok) throw new Error('HTTP ' + r.status + ' saat mengambil config GAS.');
+          return r.text();
+        })
         .then(function (text) {
           var parsed = JSON.parse(text);
           return (parsed && parsed.data) ? parsed.data : parsed;
+        })
+        .catch(function (err) {
+          console.warn('[GasAPI] getConfig gagal:', err.message || err);
+          // Kirim event dengan detail kosong agar app tidak hang
+          var ev = new CustomEvent('gasConfigLoaded', { detail: {} });
+          document.dispatchEvent(ev);
+          return {};
         });
     },
 
@@ -454,10 +464,7 @@
       });
   }
 
-  function _setCfgElement(selector, value) {
-    var el = document.querySelector(selector);
-    if (el) el.textContent = value;
-  }
+  // _setCfgElement dihapus — dead code, tidak dipakai oleh _bootstrap
 
   // ═══════════════════════════════════════════════════════════════════════
   // .env HELPER — untuk dev lokal
