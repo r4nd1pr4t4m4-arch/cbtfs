@@ -3,15 +3,26 @@
   "name": "sipadu-cbt",
   "buildCommand": "node build.js",
   "outputDirectory": ".",
-  "builds": [
-    { "src": "index.html",   "use": "@vercel/static" },
-    { "src": "api-client.js","use": "@vercel/static" }
-  ],
   "routes": [
     {
-      "src": "/api-client.js",
+      "src": "/api-client\\.js",
       "headers": { "Cache-Control": "public, max-age=3600" },
       "dest": "/api-client.js"
+    },
+    {
+      "src": "/css/(.*)",
+      "headers": { "Cache-Control": "public, max-age=86400" },
+      "dest": "/css/$1"
+    },
+    {
+      "src": "/js/(.*)",
+      "headers": { "Cache-Control": "public, max-age=86400" },
+      "dest": "/js/$1"
+    },
+    {
+      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot))",
+      "headers": { "Cache-Control": "public, max-age=86400" },
+      "dest": "/$1"
     },
     {
       "src": "/(.*)",
