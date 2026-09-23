@@ -1,4 +1,4 @@
-﻿/**
+/**
  * results.js — Hasil dan Nilai
  * renderResults() + _rs* helpers + unlockStudent + downloadResultPDF + viewStudentAnswers
  * Sumber: index.html L24441-25829
@@ -1381,15 +1381,6 @@ function applyStudentHeaderColor(userID) {
   console.log(`[CBT] Header warna untuk ${userID}: ${colorObj.bg}`);
 }
 
-// ===== ORIENTATION GATE (login siswa mobile) =====
-// Dijalankan di handleLogin() SEBELUM request ke server,
-// hanya saat loginMode === 'siswa' dan perangkat mobile.
-// Strategi:
-//   1. Jika sudah landscape → langsung panggil callback (lanjut login).
-//   2. Jika portrait + Screen Orientation API tersedia → coba lock('landscape').
-//      Jika berhasil → langsung lanjut.
-//      Jika gagal (iOS / ditolak) → tampilkan Swal fallback.
-//   3. Fallback Swal: instruksi visual, tombol "Lanjutkan" hanya aktif
-//      saat orientasi sudah landscape (dipantau via matchMedia + resize).
 
-/**
+// Orientation gate helpers (_isMobileDevice, _isPortrait, _requestLandscapeBeforeLogin)
+// ada di exam.js — tidak perlu didefinisikan ulang di sini.
