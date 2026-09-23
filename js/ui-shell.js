@@ -1,4 +1,4 @@
-﻿/**
+/**
  * ui-shell.js — Shell UI Helpers
  * SIPADU CBT v5.1.0
  *
@@ -12,12 +12,7 @@
  */
 
 /* ─── Sidebar & Navbar helpers (L15301-15480) ─── */
-function formatScore(val) {
-  if (val === '-' || val === '' || val === null || val === undefined) return '-';
-  const n = parseFloat(val);
-  if (isNaN(n)) return '-';
-  return n.toFixed(2);
-}
+// formatScore ada di utils.js
 
 function _updateCollapseIcon() {
   const sidebar = document.getElementById('admin-sidebar');
@@ -93,17 +88,14 @@ window.addEventListener('resize', function() {
   }
 });
 
+// setDateDisplay: sudah ditangani oleh _tickClock — tidak perlu dipanggil terpisah.
+// Tetap ada sebagai alias aman untuk pemanggil lama.
 function setDateDisplay() {
-  const d = new Date();
-  const opts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-  const tz = window._appTimezone || undefined;
-  const dateStr = tz ? d.toLocaleDateString('id-ID', { ...opts, timeZone: tz }) : d.toLocaleDateString('id-ID', opts);
-  const el = document.getElementById('current-date-display');
-  if (el) el.innerText = dateStr;
+  _tickClock();
 }
 
-window._appTimezone  = null;
-window._clockInterval = null;
+// Inisialisasi clock state — jangan timpa nilai yang sudah di-set bootstrap.
+if (!window._clockInterval) window._clockInterval = null;
 
 function _triggerDirectDownload(url, filename) {
   const a = document.createElement('a');
@@ -256,13 +248,14 @@ function updateDashBellBadge() {
 function refreshDashBell() {
   const list = document.getElementById('dash-bell-list');
   if (list) list.innerHTML = '<div class="dash-bell-empty"><i class="fas fa-circle-notch fa-spin mr-1"></i> Menyegarkan...</div>';
+  if (!currentUser) { _renderDashBellList(); return; }
   google.script.run
-    .withSuccessHandler(exams => {
+    .withSuccessHandler(function(exams) {
       cachedExams = Array.isArray(exams) ? exams : [];
       _renderDashBellList();
       updateDashBellBadge();
     })
-    .withFailureHandler(() => {
+    .withFailureHandler(function() {
       if (list) list.innerHTML = '<div class="dash-bell-empty">Gagal memuat. Coba lagi.</div>';
     })
     .getExamList(currentUser.userID, currentUser.token);
@@ -480,3 +473,4 @@ document.addEventListener('keydown', function(e) {
   const palette = document.getElementById('dash-cmdk');
   if (palette && palette.classList.contains('show')) closeDashCmdK();
   else openDashCmdK();
+});
