@@ -1,4 +1,4 @@
-﻿/**
+/**
  * login.js — Login Page Logic
  * _lpInitLoginUX(), downloadTemplateExcel(), processExcelImport(),
  * showBatchForm(), parseBatchText(), processBatchInput(), resetExamAttempt()
@@ -115,8 +115,8 @@ function _lpInitLoginUX() {
     }
 
     // Current year footer
-    const yr = document.getElementById('currentYear');
-    if (yr) yr.textContent = new Date().getFullYear();
+    const yearElement = document.getElementById('currentYear');
+    if (yearElement) yearElement.textContent = new Date().getFullYear();
 
     // Global ESC for results modals (grading)
     document.addEventListener('keydown', function(e) {
