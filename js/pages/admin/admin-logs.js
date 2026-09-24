@@ -1,4 +1,4 @@
-﻿/**
+/**
  * admin-logs.js — Log Aktivitas Admin
  * renderAdminLogs() + _al* helpers + backup handlers
  * Sumber: index.html L44739-45328
@@ -568,29 +568,3 @@
         .setupSemesterBackupTrigger();
     });
   }
-
-  const yr = document.getElementById('currentYear');
-  if (yr) yr.textContent = new Date().getFullYear();
-
-// ─────────────────────────────────────────────────────────────────
-//   MODUL PENGAWAS UJIAN
-//   • initSupervisorPanel()        – boostrap panel pengawas
-//   • renderSupervisorHome()       – dashboard pengawas
-//   • renderSupervisorMonitor()    – monitor ujian pengawas
-//   • renderSupervisorManagement() – manajemen pengawas (Admin)
-//   ============================================================ -->
-// ─────────────────────────────────────────────────────────────────
-// State monitor pengawas (live-mode)
-// ─────────────────────────────────────────────────────────────────
-var _svMonitorLive      = false;
-var _svMonitorTimer     = null;
-var _svMonitorRawData   = null;
-var _svMonitorActiveTab = 'semua';
-var _svMonitorExamFilter = '';
-var _svLiveSecs         = 30;
-var _svLiveElapsed      = 0;
-var _svLiveRingTimer    = null;
-
-// ─────────────────────────────────────────────────────────────────
-// Panel Pengawas Bootstrap
-// ─────────────────────────────────────────────────────────────────
